@@ -1,0 +1,49 @@
+{% extends "base-unbranded.html" %}
+
+{% load static %}
+
+{% block body %}
+    <div id="navbar">
+        <div id="home_link">
+            <a class="left" href="{% url 'bitfit:home' %}">Bitfit</a>
+        </div>
+
+        {% if request.user.is_authenticated %}
+        <div id="profile_link">
+            <a class="left" href="{% url 'bitfit:profile' %}">Profile</a>
+        </div>
+        {% endif %}
+
+        <div id="random_link">
+            {% if question %}
+            <a class="left" href="/random/{{question.id}}">Random Question</a>
+            {% else %}
+            <a class="left" href="/random/0">Random Question</a>
+            {% endif %}
+        </div>
+
+        {% if request.user.is_authenticated %}
+        <div id="logout_link">
+            <a class="right" href="{% url 'account_logout' %}">Logout</a>
+        </div>
+        {% else %}
+        <div id="login_link">
+            <a class="right" href="{% url 'account_signup' %}">Sign Up</a>
+            <a class="right" href="{% url 'account_login' %}">Login</a>
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+{% endblock body %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'js/bitfit/base.js' %}"></script>
+{% endblock scripts %}
+
+{% block css %}
+    <link href="{% static 'css/bitfit.css' %}" rel="stylesheet">
+{% endblock css %}

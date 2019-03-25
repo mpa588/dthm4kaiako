@@ -1,0 +1,90 @@
+{% extends 'bitfit/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div id="profile-info">
+        <h1>Bitfit Profile</h1>
+
+        <p>Change your name, email, password on your <a href="{% url 'users:detail' request.user.pk  %}">dthm4kaiako user profile</a>.</p>
+        <b>Name</b>: {{user.first_name}} {{user.last_name}}
+        <br>
+        <b>Last login</b>: {{user.last_login|date:"M d, Y"}}
+        <br>
+        <b>Date joined</b>: {{user.date_joined}}
+        <br>
+        <p>
+            <strong>Days logged in</strong>:
+        </p>
+        <ul>
+            {% for day in user.profile.loginday_set.all %}
+                <li>{{ day }}</li>
+            {% endfor %}
+        </ul>
+        <b>Points</b>: {{user.profile.points}}
+        <br>
+        <b>Achievements</b>:
+        <br>
+        {% for badge in all_badges %}
+            {% if badge in user.profile.earned_badges.all %}
+            <u>{{badge.name}} - {{badge.description}}</u>
+            {% else %}
+            <i>{{badge.name}} - {{badge.description}}</i>
+            {% endif %}
+            <br>
+        {% endfor %}
+        <b>History</b>:
+        <br>
+        {% for question in history %}
+        <a href="/questions/{{question.id}}">
+            {% if question.completed %}
+            <div class="completed">
+                {{question.latest_attempt}} {{question.title}}. Attempts: {{question.n_attempts}}
+            </div>
+            {% else %}
+            <div class="attempted">
+                {{question.latest_attempt}} {{question.title}}. Attempts: {{question.n_attempts}}
+            </div>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    <br>
+    <b>Fitness goals</b>:
+    <br>
+    <p>
+        Below you can set the number of questions you aim to attempt each week.
+        The fitness meter gives a visualisation of how well you are meeting your goal
+        based on your activity over the last five weeks.
+    </p>
+    <p>
+        <select id="goal_choice">
+        {% for n in "1234567" %}
+            <option value={{n}} {% if n in goal|linebreaks %} selected {% endif %}>{{n}}</option>
+        {% endfor %}
+        </select>
+        question(s) per week
+    </p>
+    <div class="js-gauge demo gauge"></div>
+
+    Number of questions attempted:
+    <br>
+    {% for week in past_5_weeks %}
+    <div id="past-5-weeks">
+        <div id="week{{forloop.counter0}}" class="numberCircle">
+            {{week.n_attempts}}
+        </div>
+        <div>{{week.label}}</div>
+        <div>Mon {{week.week|date:"d M"}}</div>
+    </div>
+    {% endfor %}
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.2/raphael-min.js"></script>
+    <script src="{% static 'js/bitfit/vendor/kuma-gauge.jquery.js' %}"></script>
+
+    <script src="{% static 'js/bitfit/profile.js' %}"></script>
+{% endblock %}

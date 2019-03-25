@@ -32,6 +32,13 @@ from tests.dtta.factories import (
     PageFactory,
     RelatedLinkFactory,
 )
+from bitfit.models import (
+    Programming,
+    TestCaseProgram,
+)
+
+
+LOG_HEADER = '\n{}\n' + ('-' * 20)
 
 
 class Command(management.base.BaseCommand):
@@ -47,11 +54,12 @@ class Command(management.base.BaseCommand):
             )
 
         # Clear all data
+        print(LOG_HEADER.format('Wipe database'))
         management.call_command('flush', interactive=False)
         print('Database wiped.')
 
+        print(LOG_HEADER.format('Create sample users'))
         User = get_user_model()
-
         # Create admin account
         admin = User.objects.create_superuser(
             'admin',
@@ -85,6 +93,7 @@ class Command(management.base.BaseCommand):
         print('User created.')
 
         # Resources
+        print(LOG_HEADER.format('Resources sample data'))
         Language.objects.create(name='English', css_class='language-en')
         Language.objects.create(name='Māori', css_class='language-mi')
         print('Languages created.')
@@ -144,6 +153,7 @@ class Command(management.base.BaseCommand):
         print('Resources created.')
 
         # Events
+        print(LOG_HEADER.format('Events sample data'))
         SponsorFactory.create_batch(size=10)
         print('Event sponsors created.')
         OrganiserFactory.create_batch(size=10)
@@ -197,9 +207,24 @@ class Command(management.base.BaseCommand):
         print('Events created.')
 
         # DTTA
+        print(LOG_HEADER.format('DTTA sample data'))
         NewsArticleFactory.create_batch(size=20)
         print('DTTA news articles created.')
         PageFactory.create_batch(size=5)
         print('DTTA pages created.')
         RelatedLinkFactory.create_batch(size=10)
         print('DTTA related links created.')
+
+        # Bitfit
+        print(LOG_HEADER.format('BitFit sample data'))
+        question_1 = Programming.objects.create(
+            title='Say hello!',
+            question_text='Print the text "Hello world!"',
+            solution='print("Hello world!")',
+        )
+        answer_1 = TestCaseProgram.objects.create(
+            test_input='',
+            expected_output='Hello world!',
+            question=question_1,
+        )
+        print('Programming question added.')

@@ -1,0 +1,30 @@
+{% extends "bitfit/base.html" %}
+
+{% block content %}
+{% if history %}
+    <b>Recommended Questions</b>
+    <br>
+    <ul>
+    {% for question in history %}
+    <li>
+        <a href="{% url 'bitfit:question' question.id %}">
+            {{question.title}}
+        </a>
+    </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<b>Skill Areas</b>
+{% if skill_list %}
+    <ul>
+    {% for skill in skill_list %}
+        <li>
+            <a href="{% url 'bitfit:skill' skill.id %}">{{skill.name}}</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No skill areas are available (use admin site to add)</p>
+{% endif %}
+{% endblock %}

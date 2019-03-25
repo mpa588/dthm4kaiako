@@ -7,7 +7,8 @@ const js_files_skip_optimisation = [
   // Optimise all files
   '**',
   // But skip the following files
-  // For example: '!static/js/vendor/**/*.js'
+  '!static/js/bitfit/vendor/**/*.js',
+  '!static/js/bitfit/base.js',
 ];
 
 // general
