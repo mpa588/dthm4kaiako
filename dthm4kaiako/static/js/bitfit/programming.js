@@ -1,5 +1,28 @@
 require('./base.js');
 require('skulpt');
+var CodeMirror = require('codemirror');
+require('codemirror/mode/python/python.js');
+
+$(document).ready(function () {
+    $('#run_code').click(function () {
+        var python_code = editor.getValue();
+        run_python_code(python_code);
+    });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: {
+            name: "python",
+            version: 3,
+            singleLineStringErrors: false
+        },
+        lineNumbers: true,
+        textWrapping: false,
+        styleActiveLine: true,
+        autofocus: true,
+        indentUnit: 4,
+        viewportMargin: Infinity
+    });
+});
 
 // Setup Skulpt
 function builtinRead(x) {
@@ -18,13 +41,9 @@ Sk.configure({
     python3: true
 });
 
-$(document).ready(function () {
-    $('#run_code').click(run_python_code);
-});
-
-function run_python_code() {
+function run_python_code(python_code) {
     document.getElementById("output").innerHTML = "";
-    Sk.importMainWithBody("<stdin>", false, document.getElementById("code").value, true);
+    Sk.importMainWithBody("<stdin>", false, python_code, true);
 }
 
 
