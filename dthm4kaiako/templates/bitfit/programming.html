@@ -1,15 +1,18 @@
-<form class="form-inline">
-    <div class="form-group" style="display:block">
-        <div id="editor" class="form-control">{{previous_attempt}}</div>
-    </div>
-</form>
+<!-- {{ previous_attempt }} -->
+
+<textarea id="code">
+for i in range(0,100):
+    print(i)
+</textarea><br />
+
 <p>
     {% if request.user.is_authenticated %}
-    <input id="save" type="button" value="Save" />
-    <img id="has_saved"  class="hidden" src="https://png.icons8.com/color/50/000000/ok.png" />
+        <!-- <input id="save" type="button" value="Save" /> -->
+        <img id="has_saved"  class="hidden" src="https://png.icons8.com/color/50/000000/ok.png" />
     {% endif %}
-    <input id="submit" type="button" value="Submit" />
+    <input id="run_code" type="button" value="Run code" />
 </p>
+<pre id="output"></pre>
 <div id="loading" class="hidden">
     Loading...
 </div>
