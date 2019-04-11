@@ -5,7 +5,7 @@
 {% block question %}
     <div class="col-12">
         <div class="border mb-3">
-            <textarea id="code"></textarea>
+            <textarea id="code" class="hidden"></textarea>
         </div>
 
         <p>
@@ -31,6 +31,7 @@
     {{ block.super }}
     <script>
         var solution = '{{ question.solution|linebreaks }}';
+        var testcases = {{ test_cases_json|safe }};
     </script>
     <script src="{% static 'js/bitfit/question_types/program.js' %}"></script>
 {% endblock %}

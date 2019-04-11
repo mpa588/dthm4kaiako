@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.core import serializers
 import requests
 import time
 import datetime
@@ -16,7 +16,10 @@ from ast import literal_eval
 import jinja2
 
 from .forms import *
-from .models import *
+from bitfit.models import (
+    Question,
+    TestCase,
+)
 
 
 class IndexView(generic.base.TemplateView):
@@ -306,12 +309,16 @@ class QuestionView(generic.base.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         try:
-            self.question = Question.objects.get_subclass(pk=self.kwargs['pk'])
+            self.question = Question.objects.get_subclass(
+                pk=self.kwargs['pk']
+            )
         except Question.DoesNotExist:
             raise Http404("No question matches the given ID.")
         context['question'] = self.question
+        test_cases = self.question.test_cases.values()
+        context['test_cases'] = test_cases
+        context['test_cases_json'] = json.dumps(list(test_cases))
 
         # if self.request.user.is_authenticated:
         #     question = self.get_object()

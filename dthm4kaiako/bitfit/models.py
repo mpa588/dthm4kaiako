@@ -116,14 +116,19 @@ class Question(models.Model):
 
 
 class TestCase(models.Model):
+    """Base class for a question for TestCase.
+
+    Aims to be an abstract class as test cases should be
+    a particular subtype, though the class is not made
+    completely abstract to allow retrieving all child
+    objects through the InheritanceManager.
+    """
     test_input = models.CharField(max_length=LARGE, blank=True)
     expected_output = models.CharField(max_length=LARGE, blank=True)
+    objects = InheritanceManager()
 
     def __str__(self):
         return 'Test case for {} ({} > {})'.format(self.question.title, self.test_input, self.expected_output)
-
-    class Meta:
-        abstract = True
 
 # ----- Program question ------------------------------------------------------
 
@@ -138,7 +143,11 @@ class QuestionTypeProgram(Question):
 
 class QuestionTypeProgramTestCase(TestCase):
 
-    question = models.ForeignKey(QuestionTypeProgram, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        QuestionTypeProgram,
+        related_name='test_cases',
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = 'Program Question Test Case'
@@ -160,7 +169,11 @@ class QuestionTypeFunctionTestCase(TestCase):
 
     function_params = models.CharField(max_length=LARGE, blank=True)
     expected_return = models.CharField(max_length=LARGE, blank=True)
-    question = models.ForeignKey(QuestionTypeFunction, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        QuestionTypeFunction,
+        related_name='test_cases',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = 'Function Question Test Case'

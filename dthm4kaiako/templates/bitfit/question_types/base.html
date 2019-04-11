@@ -2,19 +2,8 @@
 
 {% load static %}
 
-{% block css %}
-    {{ block.super }}
-    {% if question_subclass == "parsons" %}
-        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/parsons.css' %}" />
-        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.css' %}" />
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.js' %}"></script>
-    {% else %}
-
-    {% endif %}
-{% endblock %}
-
 {% block content %}
-    <div class="col-12">
+    <div class="col-12 my-3">
         <h3>{{ question.title }}</h3>
         {{ question.question_text|safe }}
     </div>
@@ -62,5 +51,14 @@
             {% endif %}
         </script>
         <script src="{% static 'js/bitfit/programming.js' %}"></script>
+    {% endif %}
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    {% if question_subclass == "parsons" %}
+        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/parsons.css' %}" />
+        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.css' %}" />
+        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.js' %}"></script>
     {% endif %}
 {% endblock %}
