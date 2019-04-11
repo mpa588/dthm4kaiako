@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import generic
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -17,6 +17,29 @@ import jinja2
 
 from .forms import *
 from .models import *
+
+
+class IndexView(generic.base.TemplateView):
+    """Homepage for BitFit."""
+
+    template_name = 'bitfit/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = Question.objects.all()
+
+        # if self.request.user.is_authenticated:
+        #     user = User.objects.get(username=self.request.user.username)
+        #     all_questions = Question.objects.all()
+        #     attempted_questions = user.profile.attempted_questions.all()
+        #     new_questions = all_questions.difference(attempted_questions)[:5]
+
+        #     history = []
+        #     for question in new_questions:
+        #         if question.title not in [question['title'] for question in history]:
+        #             history.append({'title': question.title, 'id': question.pk})
+        #     context['history'] = history
+        return context
 
 class LastAccessMixin(object):
     def dispatch(self, request, *args, **kwargs):
@@ -207,8 +230,9 @@ def get_past_5_weeks(user):
     return past_5_weeks
 
 
-class ProfileView(LoginRequiredMixin, LastAccessMixin, generic.DetailView):
-    """displays user's profile"""
+class ProfileView(LoginRequiredMixin, generic.DetailView):
+    """Displays a user's BitFit profile."""
+
     login_url = '/login/'
     redirect_field_name = 'next'
     template_name = 'bitfit/profile.html'
@@ -221,113 +245,88 @@ class ProfileView(LoginRequiredMixin, LastAccessMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        user = User.objects.get(username=self.request.user.username)
-        questions = user.profile.attempted_questions.all()
+        # user = User.objects.get(username=self.request.user.username)
+        # questions = user.profile.attempted_questions.all()
 
-        check_badge_conditions(user)
+        # check_badge_conditions(user)
 
-        context['goal'] = user.profile.goal
-        context['all_badges'] = Badge.objects.all()
-        context['past_5_weeks'] = get_past_5_weeks(user)
+        # context['goal'] = user.profile.goal
+        # context['all_badges'] = Badge.objects.all()
+        # context['past_5_weeks'] = get_past_5_weeks(user)
 
-        history = []
-        for question in questions:
-            if question.title not in [question['title'] for question in history]:
-                attempts = Attempt.objects.filter(profile=user.profile, question=question, is_save=False)
-                if len(attempts) > 0:
-                    max_date = max(attempt.date for attempt in attempts)
-                    completed = any(attempt.passed_tests for attempt in attempts)
-                    history.append({'latest_attempt': max_date,'title': question.title,'n_attempts': len(attempts), 'completed': completed, 'id': question.pk})
-        context['history'] = sorted(history, key=lambda k: k['latest_attempt'], reverse=True)
+        # history = []
+        # for question in questions:
+        #     if question.title not in [question['title'] for question in history]:
+        #         attempts = Attempt.objects.filter(profile=user.profile, question=question, is_save=False)
+        #         if len(attempts) > 0:
+        #             max_date = max(attempt.date for attempt in attempts)
+        #             completed = any(attempt.passed_tests for attempt in attempts)
+        #             history.append({'latest_attempt': max_date,'title': question.title,'n_attempts': len(attempts), 'completed': completed, 'id': question.pk})
+        # context['history'] = sorted(history, key=lambda k: k['latest_attempt'], reverse=True)
         return context
 
 
-class IndexView(LastAccessMixin, generic.ListView):
-    """displays list of skills"""
-    template_name = 'bitfit/index.html'
-    context_object_name = 'skill_list'
 
-    def get_queryset(self):
-        return SkillArea.objects.order_by('name')
+# class SkillView(LastAccessMixin, generic.DetailView):
+#     """displays list of questions which involve this skill"""
+#     template_name = 'bitfit/skill.html'
+#     context_object_name = 'skill'
+#     model = SkillArea
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+
+#         skill = self.get_object()
+#         questions = skill.questions.all()
+#         context['questions'] = questions
+
+#         if self.request.user.is_authenticated:
+#             user = User.objects.get(username=self.request.user.username)
+
+#             history = []
+#             for question in questions:
+#                 if question.title not in [question['title'] for question in history]:
+#                     attempts = Attempt.objects.filter(profile=user.profile, question=question, is_save=False)
+#                     attempted = False
+#                     completed = False
+#                     if len(attempts) > 0:
+#                         attempted = True
+#                         completed = any(attempt.passed_tests for attempt in attempts)
+#                     history.append({'attempted': attempted, 'completed': completed,'title': question.title, 'id': question.pk})
+#             context['questions'] = history
+#         return context
+
+
+class QuestionView(generic.base.TemplateView):
+    """Displays a question for Bitfit.
+
+    This view requires to retrieve the object first in the context,
+    in order to determine the required template to render.
+    """
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated:
-            user = User.objects.get(username=self.request.user.username)
-            all_questions = Question.objects.all()
-            attempted_questions = user.profile.attempted_questions.all()
-            new_questions = all_questions.difference(attempted_questions)[:5]
+        try:
+            self.question = Question.objects.get_subclass(pk=self.kwargs['pk'])
+        except Question.DoesNotExist:
+            raise Http404("No question matches the given ID.")
+        context['question'] = self.question
 
-            history = []
-            for question in new_questions:
-                if question.title not in [question['title'] for question in history]:
-                    history.append({'title': question.title, 'id': question.pk})
-            context['history'] = history
+        # if self.request.user.is_authenticated:
+        #     question = self.get_object()
+        #     profile = self.request.user.profile
+        #     all_attempts = Attempt.objects.filter(question=question, profile=profile)
+        #     if len(all_attempts) > 0:
+        #         context['previous_attempt'] = all_attempts.latest('date').user_code
         return context
 
+    def get_template_names(self, **kwargs):
+        """Returns  list of template name for rendering the template.
 
-class SkillView(LastAccessMixin, generic.DetailView):
-    """displays list of questions which involve this skill"""
-    template_name = 'bitfit/skill.html'
-    context_object_name = 'skill'
-    model = SkillArea
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        skill = self.get_object()
-        questions = skill.questions.all()
-        context['questions'] = questions
-
-        if self.request.user.is_authenticated:
-            user = User.objects.get(username=self.request.user.username)
-
-            history = []
-            for question in questions:
-                if question.title not in [question['title'] for question in history]:
-                    attempts = Attempt.objects.filter(profile=user.profile, question=question, is_save=False)
-                    attempted = False
-                    completed = False
-                    if len(attempts) > 0:
-                        attempted = True
-                        completed = any(attempt.passed_tests for attempt in attempts)
-                    history.append({'attempted': attempted, 'completed': completed,'title': question.title, 'id': question.pk})
-            context['questions'] = history
-        return context
-
-
-class QuestionView(LastAccessMixin, generic.DetailView):
-    """Displays a question for Bitfit."""
-
-    template_name = 'bitfit/question.html'
-    model = Question
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = DebugInputForm()
-
-        question = Question.objects.get_subclass(pk=self.get_object().pk)
-        if isinstance(question, ProgrammingFunction):
-            subclass = "programming_func"
-        elif isinstance(question, Programming):
-            subclass = "programming"
-        elif isinstance(question, BuggyFunction):
-            subclass = "buggy_func"
-        elif isinstance(question, Buggy):
-            subclass = "buggy"
-        else:
-            subclass = "parsons"
-
-        context['question_subclass'] = subclass
-
-        if self.request.user.is_authenticated:
-            question = self.get_object()
-            profile = self.request.user.profile
-            all_attempts = Attempt.objects.filter(question=question, profile=profile)
-            if len(all_attempts) > 0:
-                context['previous_attempt'] = all_attempts.latest('date').user_code
-        return context
+        Overrides default DetailView template method.
+        """
+        return ['bitfit/question_types/{}.html'.format(self.question.QUESTION_TYPE)]
 
 
 

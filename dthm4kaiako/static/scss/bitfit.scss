@@ -1,21 +1,15 @@
 @import "node_modules/codemirror/lib/codemirror";
 
-li a {
-    color: #793698;
+// New styles
+
+#error-output {
+    background-color: #252428;
+    padding: 0 0.2rem;
+    color: #ff6161;
+    font-weight: bold;
 }
 
-a:hover {
-    text-decoration: none;
-    color: #41005f;
-}
-
-ul {
-    list-style-type: circle;
-}
-
-#content {
-    margin: 2%;
-}
+// Existing styles
 
 #navbar {
     background-color: #333;
@@ -85,9 +79,6 @@ a.right {
 .header {
     display: table-row;
     font-weight: bold;
-}
-.row {
-    display: table-row;
 }
 .cell {
     display: table-cell;

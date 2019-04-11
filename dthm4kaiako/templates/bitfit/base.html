@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block body %}
+{% block content_container %}
     <div id="navbar">
         <div id="home_link">
             <a class="left" href="{% url 'bitfit:home' %}">Bitfit</a>
@@ -13,14 +13,6 @@
             <a class="left" href="{% url 'bitfit:profile' %}">Profile</a>
         </div>
         {% endif %}
-
-        <div id="random_link">
-            {% if question %}
-            <a class="left" href="/random/{{question.id}}">Random Question</a>
-            {% else %}
-            <a class="left" href="/random/0">Random Question</a>
-            {% endif %}
-        </div>
 
         {% if request.user.is_authenticated %}
         <div id="logout_link">
@@ -35,15 +27,15 @@
     </div>
 
 
-    <div id="content">
-        {% block content %}{% endblock %}
+    <div id="content-container" class="container">
+        <div class="row">
+            {% block content %}
+            {% endblock content %}
+        </div>
     </div>
-{% endblock body %}
-
-{% block scripts %}
-    <script type="text/javascript" src="{% static 'js/bitfit/base.js' %}"></script>
-{% endblock scripts %}
+{% endblock content_container %}
 
 {% block css %}
+    {{ block.super }}
     <link href="{% static 'css/bitfit.css' %}" rel="stylesheet">
 {% endblock css %}

@@ -2,12 +2,9 @@
 
 {% load static %}
 
-{% block page_heading %}
-    <h1 id="acc-title" class="text-center">Authentic Context Cards</h1>
-{% endblock page_heading %}
-
-{% block content_container %}
+{% block content %}
     <div class="col-12 text-center">
+        <h1 id="acc-title" class="text-center">Authentic Context Cards</h1>
         <p class="lead">
             Sets of printable cards of New Zealand achievement objectives for prompting authentic contexts.{{ STATIC_PREFIX }}
         </p>
@@ -61,7 +58,7 @@
 
         <p><strong>Feedback? Suggestions?</strong> Please <a href="{% url 'general:contact' %}">contact us here</a>.</p>
     </div>
-{% endblock content_container %}
+{% endblock content %}
 
 {% block css %}
     <link href="{% static 'css/authentic-context-cards.css' %}" rel="stylesheet">

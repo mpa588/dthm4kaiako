@@ -33,8 +33,8 @@ from tests.dtta.factories import (
     RelatedLinkFactory,
 )
 from bitfit.models import (
-    Programming,
-    TestCaseProgram,
+    QuestionTypeProgram,
+    QuestionTypeProgramTestCase,
 )
 
 
@@ -217,12 +217,12 @@ class Command(management.base.BaseCommand):
 
         # Bitfit
         print(LOG_HEADER.format('BitFit sample data'))
-        question_1 = Programming.objects.create(
+        question_1 = QuestionTypeProgram.objects.create(
             title='Say hello!',
-            question_text='Print the text "Hello world!"',
+            question_text='<p>Print the text <code>Hello world!</code></p>',
             solution='print("Hello world!")',
         )
-        answer_1 = TestCaseProgram.objects.create(
+        answer_1 = QuestionTypeProgramTestCase.objects.create(
             test_input='',
             expected_output='Hello world!',
             question=question_1,

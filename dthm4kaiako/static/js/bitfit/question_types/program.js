@@ -43,7 +43,17 @@ Sk.configure({
 
 function run_python_code(python_code) {
     document.getElementById("output").innerHTML = "";
-    Sk.importMainWithBody("<stdin>", false, python_code, true);
+    document.getElementById("error-output").innerHTML = "";
+    try {
+        if (python_code.trim()) {
+            Sk.importMainWithBody("<stdin>", false, python_code, true);
+        } else {
+            throw new Error('No Python code provided.')
+        }
+
+    } catch (error) {
+        document.getElementById("error-output").innerHTML = error.toString();
+    }
 }
 
 

@@ -16,6 +16,9 @@ env = environ.Env()
 DEBUG = env.bool('DJANGO_DEBUG', False)
 DJANGO_PRODUCTION = env.bool('DJANGO_PRODUCTION')
 
+LANGUAGES = (
+    ("en", "English"),
+)
 # Local time zone. Choices are
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.

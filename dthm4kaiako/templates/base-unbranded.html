@@ -3,22 +3,14 @@
 {% load static i18n activeurl %}
 
 {% block body %}
-  <div id="page-header" class="my-3">
-    <div class="container">
-      {% block page_heading %}
-      {% endblock page_heading %}
+  {% block content_container %}
+    <div id="content-container" class="container">
+      <div class="row">
+        {% block content %}
+        {% endblock content %}
+      </div>
     </div>
-  </div>
-  <div id="content-container" class="container">
-    <div class="row">
-      {% block content_container %}
-        <div class="col-12">
-          {% block content %}
-          {% endblock content %}
-        </div>
-      {% endblock content_container %}
-    </div>
-  </div>
+  {% endblock content_container %}
 
 
   <footer class="py-3 mt-5 d-print-none white-footer text-center">
