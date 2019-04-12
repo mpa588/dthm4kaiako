@@ -31,12 +31,6 @@ $(document).ready(function () {
     });
 });
 
-// Setup Skulpt to read internal library files
-function builtinRead(x) {
-    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-        throw "File not found: '" + x + "'";
-    return Sk.builtinFiles["files"][x];
-}
 
 function update_test_case_status(test_case) {
     var test_case_id = test_case['id'];
@@ -87,7 +81,12 @@ function run_python_code(user_code, test_case) {
     document.getElementById("error-output").innerHTML = "";
     // Configure Skulpt for running Python code
     Sk.configure({
-        read: builtinRead,
+        // Setup Skulpt to read internal library files
+        read: function (x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        },
         // Placeholder function to display prompt when input is called
         inputfun: function (str) {
             var input_element = $('#test-case-' + test_case['id'] + '-input');
