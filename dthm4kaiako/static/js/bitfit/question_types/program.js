@@ -111,7 +111,8 @@ function run_python_code(user_code, test_case) {
         output: function(received_output) {
             test_case['received_output'] += received_output;
         },
-        python3: true
+        python3: true,
+        execLimit: 1000,
     });
     if (typeof user_code == 'string' && user_code.trim()) {
         try {
