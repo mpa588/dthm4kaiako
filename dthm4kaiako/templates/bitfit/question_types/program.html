@@ -5,7 +5,12 @@
 {% block question %}
     <div class="col-12">
         <div class="border mb-3">
-            <textarea id="code" class="hidden">print("hello")</textarea>
+            <textarea id="code" class="hidden">
+print("hello")
+print("hello")
+print("hello")
+print("hello")
+</textarea>
         </div>
 
         <p>
@@ -40,13 +45,13 @@
                 {% for test_case in test_cases %}
                     <tr id="test-case-{{ test_case.id }}-row">
                         <td>
-                            <pre class="mb-0">{{ test_case.test_input }}</pre>
+                            <pre class="mb-0" id="test-case-{{ test_case.id }}-input">{{ test_case.test_input }}</pre>
                         </td>
                         <td>
-                            <pre class="mb-0">{{ test_case.expected_output }}</pre>
+                            <pre class="mb-0" id="test-case-{{ test_case.id }}-expected-output">{{ test_case.expected_output }}</pre>
                         </td>
                         <td>
-                            <pre class="mb-0" id="test-case-{{ test_case.id }}-output"></pre>
+                            <pre class="mb-0 test-case-output" id="test-case-{{ test_case.id }}-output"></pre>
                         </td>
                         <td id="test-case-{{ test_case.id }}-status">
                             <span class="text-muted">

@@ -5,6 +5,7 @@ require('codemirror/mode/python/python.js');
 
 $(document).ready(function () {
     $('#run_code').click(function () {
+        $('.test-case-output').empty();
         var user_code = editor.getValue();
         run_test_cases(user_code);
     });
@@ -31,8 +32,19 @@ function builtinRead(x) {
     return Sk.builtinFiles["files"][x];
 }
 
-function update_test_case_status(test_case, success, output) {
+function update_test_case_status(test_case) {
     var test_case_id = test_case['id'];
+
+    var output_element = $('#test-case-' + test_case_id + '-output');
+    var output = output_element.text();
+
+    var expected_output = test_case.expected_output;
+    // Add trailing newline to expected output
+    // TODO: Move to database step
+    if (!expected_output.endsWith('\n')) {
+        expected_output += '\n';
+    }
+    var success = output === expected_output;
 
     // Update status element
     var status_element = $('#test-case-' + test_case_id + '-status');
@@ -43,10 +55,6 @@ function update_test_case_status(test_case, success, output) {
         status_text = 'Failed'
     }
     status_element.text(status_text);
-
-    // Update output element
-    var output_element = $('#test-case-' + test_case_id + '-output');
-    output_element.text(output);
 
     // Update row element
     var row_element = $('#test-case-' + test_case_id + '-row');
@@ -62,7 +70,9 @@ function update_test_case_status(test_case, success, output) {
 function run_test_cases(user_code) {
     // Currently runs in sequential order.
     for (let i = 0; i < testcases.length; i++) {
-        run_python_code(user_code, testcases[i]);
+        var test_case = testcases[i];
+        run_python_code(user_code, test_case);
+        update_test_case_status(test_case);
     }
 }
 
@@ -79,14 +89,9 @@ function run_python_code(user_code, test_case) {
         inputfunTakesPrompt: true,
         // Append print() statements to output cell for test case
         output: function(received_output) {
-            var expected_output = test_case.expected_output;
-            // Add trailing newline to expected output
-            // TODO: Move to database step
-            if (!expected_output.endsWith('\n')) {
-                expected_output += '\n';
-            }
-            var success = received_output === expected_output;
-            update_test_case_status(test_case, success, received_output);
+            // Update output element
+            var output_element = $('#test-case-' + test_case['id'] + '-output');
+            output_element.append(document.createTextNode(received_output));
         },
         python3: true
     });
