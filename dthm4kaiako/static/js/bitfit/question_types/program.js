@@ -5,13 +5,13 @@ require('codemirror/mode/python/python.js');
 
 $(document).ready(function () {
     $('#run_code').click(function () {
-        // Set all input cells to contain list of input lines
-        $('.test-case-input').each(function (index) {
-            var element = $(this);
-            element.data('input_list', element.text().split('\n'));
-        });
-        // Empty all output cells
-        $('.test-case-output').empty();
+        for (var id in test_cases) {
+            if (test_cases.hasOwnProperty(id)) {
+                var test_case = test_cases[id];
+                test_case['received_output'] = '';
+                test_case['test_input_list'] = test_case['test_input'].split('\n');
+            }
+        }
         var user_code = editor.getValue();
         run_test_cases(user_code);
     });
@@ -29,14 +29,19 @@ $(document).ready(function () {
         indentUnit: 4,
         viewportMargin: Infinity
     });
+
+    for (let i = 0; i < test_cases_list.length; i++) {
+        data = test_cases_list[i];
+        test_cases[data.id] = data
+    }
 });
 
 
 function update_test_case_status(test_case) {
-    var test_case_id = test_case['id'];
+    var test_case_id = test_case.id;
 
     var output_element = $('#test-case-' + test_case_id + '-output');
-    var output = output_element.text();
+    output_element.text(test_case.received_output);
 
     var expected_output = test_case.expected_output;
     // Add trailing newline to expected output
@@ -44,7 +49,7 @@ function update_test_case_status(test_case) {
     if (!expected_output.endsWith('\n')) {
         expected_output += '\n';
     }
-    var success = output === expected_output;
+    var success = test_case.received_output === expected_output;
 
     // Update status element
     var status_element = $('#test-case-' + test_case_id + '-status');
@@ -69,10 +74,12 @@ function update_test_case_status(test_case) {
 
 function run_test_cases(user_code) {
     // Currently runs in sequential order.
-    for (let i = 0; i < testcases.length; i++) {
-        var test_case = testcases[i];
-        run_python_code(user_code, test_case);
-        update_test_case_status(test_case);
+    for (var id in test_cases) {
+        if (test_cases.hasOwnProperty(id)) {
+            var test_case = test_cases[id];
+            run_python_code(user_code, test_case);
+            update_test_case_status(test_case);
+        }
     }
 }
 
@@ -87,20 +94,13 @@ function run_python_code(user_code, test_case) {
                 throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         },
-        // Placeholder function to display prompt when input is called
         inputfun: function (str) {
-            var input_element = $('#test-case-' + test_case['id'] + '-input');
-            var input_list = input_element.data('input_list');
-            var input = input_list.shift();
-            input_element.data('input_list', input_list);
-            return input;
+            return test_case['test_input_list'].shift();
         },
         inputfunTakesPrompt: true,
-        // Append print() statements to output cell for test case
+        // Append print() statements for test case
         output: function(received_output) {
-            // Update output element
-            var output_element = $('#test-case-' + test_case['id'] + '-output');
-            output_element.append(document.createTextNode(received_output));
+            test_case['received_output'] += received_output;
         },
         python3: true
     });
