@@ -123,7 +123,7 @@ class TestCase(models.Model):
     completely abstract to allow retrieving all child
     objects through the InheritanceManager.
     """
-    test_input = models.CharField(max_length=LARGE, blank=True)
+
     expected_output = models.CharField(max_length=LARGE, blank=True)
     objects = InheritanceManager()
 
@@ -143,6 +143,7 @@ class QuestionTypeProgram(Question):
 
 class QuestionTypeProgramTestCase(TestCase):
 
+    test_input = models.CharField(max_length=LARGE, blank=True)
     question = models.ForeignKey(
         QuestionTypeProgram,
         related_name='test_cases',
