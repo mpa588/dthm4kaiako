@@ -5,8 +5,8 @@ require('codemirror/mode/python/python.js');
 
 $(document).ready(function () {
     $('#run_code').click(function () {
-        var python_code = editor.getValue();
-        run_python_code(python_code);
+        var user_code = editor.getValue();
+        run_test_cases(user_code);
     });
 
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -24,38 +24,82 @@ $(document).ready(function () {
     });
 });
 
-// Setup Skulpt
+// Setup Skulpt to read internal library files
 function builtinRead(x) {
     if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
         throw "File not found: '" + x + "'";
     return Sk.builtinFiles["files"][x];
 }
 
-function output_code(text) {
-    document.getElementById("output").innerHTML += text;
-}
+function update_test_case_status(test_case, success, output) {
+    var test_case_id = test_case['id'];
 
-Sk.configure({
-    read: builtinRead,
-    output: output_code,
-    python3: true
-});
+    // Update status element
+    var status_element = $('#test-case-' + test_case_id + '-status');
+    var status_text = '';
+    if (success) {
+        status_text = 'Passed'
+    } else {
+        status_text = 'Failed'
+    }
+    status_element.text(status_text);
 
-function run_python_code(python_code) {
-    document.getElementById("output").innerHTML = "";
-    document.getElementById("error-output").innerHTML = "";
-    try {
-        if (python_code.trim()) {
-            Sk.importMainWithBody("<stdin>", false, python_code, true);
-        } else {
-            throw new Error('No Python code provided.')
-        }
+    // Update output element
+    var output_element = $('#test-case-' + test_case_id + '-output');
+    output_element.text(output);
 
-    } catch (error) {
-        document.getElementById("error-output").innerHTML = error.toString();
+    // Update row element
+    var row_element = $('#test-case-' + test_case_id + '-row');
+    if (success) {
+        row_element.addClass('table-success');
+        row_element.removeClass('table-danger');
+    } else {
+        row_element.addClass('table-danger');
+        row_element.removeClass('table-success');
     }
 }
 
+function run_test_cases(user_code) {
+    // Currently runs in sequential order.
+    for (let i = 0; i < testcases.length; i++) {
+        run_python_code(user_code, testcases[i]);
+    }
+}
+
+function run_python_code(user_code, test_case) {
+    document.getElementById("output").innerHTML = "";
+    document.getElementById("error-output").innerHTML = "";
+    // Configure Skulpt for running Python code
+    Sk.configure({
+        read: builtinRead,
+        // Placeholder function to display prompt when input is called
+        inputfun: function (str) {
+            return window.prompt(str);
+        },
+        inputfunTakesPrompt: true,
+        // Append print() statements to output cell for test case
+        output: function(received_output) {
+            var expected_output = test_case.expected_output;
+            // Add trailing newline to expected output
+            // TODO: Move to database step
+            if (!expected_output.endsWith('\n')) {
+                expected_output += '\n';
+            }
+            var success = received_output === expected_output;
+            update_test_case_status(test_case, success, received_output);
+        },
+        python3: true
+    });
+    if (typeof user_code == 'string' && user_code.trim()) {
+        try {
+            Sk.importMainWithBody("<stdin>", false, user_code, true);
+        } catch (error) {
+            document.getElementById("error-output").innerHTML = error.toString();
+        }
+    } else {
+        throw new Error('No Python code provided.')
+    }
+}
 
 // var hide_results = function() {
 //     $('#result-table').addClass('hidden');
