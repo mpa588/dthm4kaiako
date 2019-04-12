@@ -222,12 +222,12 @@ class Command(management.base.BaseCommand):
             question_text='<p>Print the text <code>Hello world!</code></p>',
             solution='print("Hello world!")',
         )
-        answer_1 = QuestionTypeProgramTestCase.objects.create(
+        QuestionTypeProgramTestCase.objects.create(
             test_input='',
             expected_output='Hello world!',
             question=question_1,
         )
-        answer_2 = QuestionTypeProgramTestCase.objects.create(
+        QuestionTypeProgramTestCase.objects.create(
             test_input='',
             expected_output='Hello world!',
             question=question_1,
@@ -235,15 +235,15 @@ class Command(management.base.BaseCommand):
 
         question_2 = QuestionTypeProgram.objects.create(
             title='Add 10',
-            question_text='<p>Write a program that asks for a number, then adds 10 to the number, then prints it out.</p>',
+            question_text='<p>Write a program that asks for a number, adds 10 to the number, then prints it out.</p>',
             solution='number = int(input("Number:"))\nprint(number + 10)',
         )
-        answer_1 = QuestionTypeProgramTestCase.objects.create(
+        QuestionTypeProgramTestCase.objects.create(
             test_input='24\n25',
             expected_output='34',
             question=question_2,
         )
-        answer_2 = QuestionTypeProgramTestCase.objects.create(
+        QuestionTypeProgramTestCase.objects.create(
             test_input='36',
             expected_output='46',
             question=question_2,

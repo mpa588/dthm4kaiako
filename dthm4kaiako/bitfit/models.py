@@ -11,6 +11,7 @@ SMALL = 100
 LARGE = 500
 User = get_user_model()
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     points = models.IntegerField(default=0)

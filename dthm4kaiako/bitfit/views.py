@@ -337,182 +337,182 @@ class QuestionView(generic.base.TemplateView):
 
 
 
-BASE_URL = "http://36adab90.compilers.sphere-engine.com/api/v3/submissions/"
-PYTHON = 116
-COMPLETED = 0
+# BASE_URL = "http://36adab90.compilers.sphere-engine.com/api/v3/submissions/"
+# PYTHON = 116
+# COMPLETED = 0
 
-def literal_eval_params(params_text):
-    """attempts to convert params to literal list"""
-    params = "[" + params_text + "]"
-    try:
-        test_params = literal_eval(params)
-        result = {
-            'params': test_params,
-            'error': ''
-        }
-    except:
-        message = "Input formatted incorrectly. Must be valid comma-separated python. Strings must be surrounded by quotes."
-        result = {
-            'params': '',
-            'error': message
-        }
-    return result
+# def literal_eval_params(params_text):
+#     """attempts to convert params to literal list"""
+#     params = "[" + params_text + "]"
+#     try:
+#         test_params = literal_eval(params)
+#         result = {
+#             'params': test_params,
+#             'error': ''
+#         }
+#     except:
+#         message = "Input formatted incorrectly. Must be valid comma-separated python. Strings must be surrounded by quotes."
+#         result = {
+#             'params': '',
+#             'error': message
+#         }
+#     return result
 
-def send_code(request):
-    """formats code using template then sends to SphereEngine"""
-    request_json = json.loads(request.body.decode('utf-8'))
-    question_id = request_json['question']
-    question = Question.objects.get_subclass(pk=question_id)
+# def send_code(request):
+#     """formats code using template then sends to SphereEngine"""
+#     request_json = json.loads(request.body.decode('utf-8'))
+#     question_id = request_json['question']
+#     question = Question.objects.get_subclass(pk=question_id)
 
-    template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
-    template_env = jinja2.Environment(loader=template_loader)
-    template_file = "common.py"
-    template = template_env.get_template(template_file)
+#     template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
+#     template_env = jinja2.Environment(loader=template_loader)
+#     template_file = "common.py"
+#     template = template_env.get_template(template_file)
 
-    is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
-    is_buggy = isinstance(question, Buggy)
+#     is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
+#     is_buggy = isinstance(question, Buggy)
 
-    if is_buggy and not is_func:
-        user_input = ''
-    else:
-        user_input = request_json['user_input']
+#     if is_buggy and not is_func:
+#         user_input = ''
+#     else:
+#         user_input = request_json['user_input']
 
-    if is_func:
-        if is_buggy:
-            func_name = question.buggy.buggyfunction.function_name
-        else:
-            func_name = question.programming.programmingfunction.function_name
-    else:
-        func_name = ''
+#     if is_func:
+#         if is_buggy:
+#             func_name = question.buggy.buggyfunction.function_name
+#         else:
+#             func_name = question.programming.programmingfunction.function_name
+#     else:
+#         func_name = ''
 
-    if is_buggy:
-        user_stdin = request_json['buggy_stdin']
-        inputs = [user_stdin.split('\n')]
-        expected_output = request_json['expected_print']
-        outputs = [expected_output]
-        if is_func:
-            eval_result = literal_eval_params(user_input)
-            if len(eval_result['error']) > 0:
-                return JsonResponse(eval_result)
-            test_params = eval_result['params']
+#     if is_buggy:
+#         user_stdin = request_json['buggy_stdin']
+#         inputs = [user_stdin.split('\n')]
+#         expected_output = request_json['expected_print']
+#         outputs = [expected_output]
+#         if is_func:
+#             eval_result = literal_eval_params(user_input)
+#             if len(eval_result['error']) > 0:
+#                 return JsonResponse(eval_result)
+#             test_params = eval_result['params']
 
-            params = [test_params]
-            expected_return = request_json['expected_return']
-            returns = [literal_eval(expected_return) if expected_return != '' else None]
-        else:
-            params = [[]]
-            returns = []
+#             params = [test_params]
+#             expected_return = request_json['expected_return']
+#             returns = [literal_eval(expected_return) if expected_return != '' else None]
+#         else:
+#             params = [[]]
+#             returns = []
 
-        user_input = question.buggy.buggy_program
-        n_test_cases = 1
-    else:
-        if is_func:
-            test_cases = question.programming.programmingfunction.testcasefunction_set.all()
-            params = [literal_eval_params(case.function_params)['params'] for case in test_cases]
-            returns = [literal_eval(case.expected_return) if case.expected_return != '' else None for case in test_cases]
-        else:
-            test_cases = question.programming.testcaseprogram_set.all()
-            params = [[]]
-            returns = []
+#         user_input = question.buggy.buggy_program
+#         n_test_cases = 1
+#     else:
+#         if is_func:
+#             test_cases = question.programming.programmingfunction.testcasefunction_set.all()
+#             params = [literal_eval_params(case.function_params)['params'] for case in test_cases]
+#             returns = [literal_eval(case.expected_return) if case.expected_return != '' else None for case in test_cases]
+#         else:
+#             test_cases = question.programming.testcaseprogram_set.all()
+#             params = [[]]
+#             returns = []
 
-        inputs = [case.test_input.split('\n') for case in test_cases]
-        outputs = [literal_eval('"""' + case.expected_output + '"""') for case in test_cases]
-        n_test_cases = len(test_cases)
+#         inputs = [case.test_input.split('\n') for case in test_cases]
+#         outputs = [literal_eval('"""' + case.expected_output + '"""') for case in test_cases]
+#         n_test_cases = len(test_cases)
 
-    if not is_func:
-        user_input = user_input.replace('\n', '\n    ')
+#     if not is_func:
+#         user_input = user_input.replace('\n', '\n    ')
 
-    context_variables = {
-        'params': repr(params),
-        'inputs': repr(inputs),
-        'outputs': repr(outputs),
-        'returns': repr(returns),
-        'n_test_cases': n_test_cases,
-        'is_func': is_func,
-        'is_buggy': is_buggy,
-        'user_code': user_input.replace('\t', '    '),
-        'function_name': func_name
-    }
-    code = template.render(**context_variables)
-    #print(code)
-    token = "?access_token=" + Token.objects.get(pk='sphere').token
+#     context_variables = {
+#         'params': repr(params),
+#         'inputs': repr(inputs),
+#         'outputs': repr(outputs),
+#         'returns': repr(returns),
+#         'n_test_cases': n_test_cases,
+#         'is_func': is_func,
+#         'is_buggy': is_buggy,
+#         'user_code': user_input.replace('\t', '    '),
+#         'function_name': func_name
+#     }
+#     code = template.render(**context_variables)
+#     #print(code)
+#     token = "?access_token=" + Token.objects.get(pk='sphere').token
 
-    response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
-    result = response.json()
+#     response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
+#     result = response.json()
 
-    return JsonResponse(result)
+#     return JsonResponse(result)
 
-def send_solution(request):
-    """formats correct solution for buggy question type then sends to SphereEngine"""
-    request_json = json.loads(request.body.decode('utf-8'))
-    question_id = request_json['question']
-    question = Question.objects.get_subclass(pk=question_id)
-    solution = question.solution
+# def send_solution(request):
+#     """formats correct solution for buggy question type then sends to SphereEngine"""
+#     request_json = json.loads(request.body.decode('utf-8'))
+#     question_id = request_json['question']
+#     question = Question.objects.get_subclass(pk=question_id)
+#     solution = question.solution
 
-    is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
-    if is_func:
-        test_params = request_json['user_input']
-        func_name = question.buggy.buggyfunction.function_name
-    else:
-        test_params = ''
-        func_name = ''
-    test_input = request_json['buggy_stdin']
+#     is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
+#     if is_func:
+#         test_params = request_json['user_input']
+#         func_name = question.buggy.buggyfunction.function_name
+#     else:
+#         test_params = ''
+#         func_name = ''
+#     test_input = request_json['buggy_stdin']
 
-    template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
-    template_env = jinja2.Environment(loader=template_loader)
-    template_file = "common.py"
-    template = template_env.get_template(template_file)
+#     template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
+#     template_env = jinja2.Environment(loader=template_loader)
+#     template_file = "common.py"
+#     template = template_env.get_template(template_file)
 
-    eval_result = literal_eval_params(test_params)
-    if len(eval_result['error']) > 0:
-        return JsonResponse(eval_result)
-    test_params = eval_result['params']
+#     eval_result = literal_eval_params(test_params)
+#     if len(eval_result['error']) > 0:
+#         return JsonResponse(eval_result)
+#     test_params = eval_result['params']
 
-    params = [test_params]
-    inputs = [test_input.split('\n')]
-    outputs = ['']
-    returns = [None]
+#     params = [test_params]
+#     inputs = [test_input.split('\n')]
+#     outputs = ['']
+#     returns = [None]
 
-    context_variables = {
-        'params': repr(params),
-        'inputs': repr(inputs),
-        'outputs': repr(outputs),
-        'returns': repr(returns),
-        'n_test_cases': 1,
-        'is_func': is_func,
-        'is_buggy': False,
-        'user_code': solution.replace('\t', '    ').replace('\n', '\n    '),
-        'function_name': func_name
-    }
-    code = template.render(**context_variables)
-    #print(code)
-    token = "?access_token=" + Token.objects.get(pk='sphere').token
+#     context_variables = {
+#         'params': repr(params),
+#         'inputs': repr(inputs),
+#         'outputs': repr(outputs),
+#         'returns': repr(returns),
+#         'n_test_cases': 1,
+#         'is_func': is_func,
+#         'is_buggy': False,
+#         'user_code': solution.replace('\t', '    ').replace('\n', '\n    '),
+#         'function_name': func_name
+#     }
+#     code = template.render(**context_variables)
+#     #print(code)
+#     token = "?access_token=" + Token.objects.get(pk='sphere').token
 
-    response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
-    result = response.json()
+#     response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
+#     result = response.json()
 
-    return JsonResponse(result)
+#     return JsonResponse(result)
 
 
-def get_output(request):
-    """gets code output from SphereEngine (stdout, stderr, and compiler error)"""
-    request_json = json.loads(request.body.decode('utf-8'))
-    submission_id = request_json['id']
-    question_id = request_json['question']
+# def get_output(request):
+#     """gets code output from SphereEngine (stdout, stderr, and compiler error)"""
+#     request_json = json.loads(request.body.decode('utf-8'))
+#     submission_id = request_json['id']
+#     question_id = request_json['question']
 
-    token = "?access_token=" + Token.objects.get(pk='sphere').token
+#     token = "?access_token=" + Token.objects.get(pk='sphere').token
 
-    params = {
-        "withOutput": True,
-        "withStderr": True,
-        "withCmpinfo": True
-    }
-    response = requests.get(BASE_URL + submission_id + token, params=params)
-    result = response.json()
+#     params = {
+#         "withOutput": True,
+#         "withStderr": True,
+#         "withCmpinfo": True
+#     }
+#     response = requests.get(BASE_URL + submission_id + token, params=params)
+#     result = response.json()
 
-    if result["status"] == COMPLETED:
-        result["completed"] = True
-    else:
-        result["completed"] = False
+#     if result["status"] == COMPLETED:
+#         result["completed"] = True
+#     else:
+#         result["completed"] = False
 
-    return JsonResponse(result)
+#     return JsonResponse(result)
