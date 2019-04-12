@@ -3,13 +3,16 @@ require('skulpt');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/python/python.js');
 
+var test_cases = {};
+
 $(document).ready(function () {
     $('#run_code').click(function () {
         for (var id in test_cases) {
             if (test_cases.hasOwnProperty(id)) {
                 var test_case = test_cases[id];
-                test_case['received_output'] = '';
-                test_case['test_input_list'] = test_case['test_input'].split('\n');
+                test_case.received_output = '';
+                test_case.is_error = false;
+                test_case.test_input_list = test_case.test_input.split('\n');
             }
         }
         var user_code = editor.getValue();
@@ -40,18 +43,15 @@ $(document).ready(function () {
 function update_test_case_status(test_case) {
     var test_case_id = test_case.id;
 
-    var output_element = $('#test-case-' + test_case_id + '-output');
-    output_element.text(test_case.received_output);
-
     var expected_output = test_case.expected_output;
     // Add trailing newline to expected output
     // TODO: Move to database step
     if (!expected_output.endsWith('\n')) {
         expected_output += '\n';
     }
-    var success = test_case.received_output === expected_output;
+    var success = (test_case.received_output === expected_output) && !test_case.is_error;
 
-    // Update status element
+    // Update status cell
     var status_element = $('#test-case-' + test_case_id + '-status');
     var status_text = '';
     if (success) {
@@ -61,7 +61,16 @@ function update_test_case_status(test_case) {
     }
     status_element.text(status_text);
 
-    // Update row element
+    // Update output cell
+    var output_element = $('#test-case-' + test_case_id + '-output');
+    output_element.text(test_case.received_output);
+    if (test_case.is_error) {
+        output_element.addClass('error')
+    } else {
+        output_element.removeClass('error')
+    }
+
+    // Update row
     var row_element = $('#test-case-' + test_case_id + '-row');
     if (success) {
         row_element.addClass('table-success');
@@ -107,12 +116,17 @@ function run_python_code(user_code, test_case) {
     if (typeof user_code == 'string' && user_code.trim()) {
         try {
             Sk.importMainWithBody("<stdin>", false, user_code, true);
-        // TODO: Only catch Python errors
         } catch (error) {
-            document.getElementById("error-output").innerHTML = error.toString();
+            if (error.constructor.sk$type) {
+                test_case.received_output = error.toString();
+                test_case.is_error = true;
+            } else {
+                throw error;
+            }
         }
     } else {
-        throw new Error('No Python code provided.')
+        test_case.received_output = 'No Python code provided.';
+        test_case.is_error = true;
     }
 }
 
