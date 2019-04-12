@@ -227,4 +227,25 @@ class Command(management.base.BaseCommand):
             expected_output='Hello world!',
             question=question_1,
         )
+        answer_2 = QuestionTypeProgramTestCase.objects.create(
+            test_input='',
+            expected_output='Hello world!',
+            question=question_1,
+        )
+
+        question_2 = QuestionTypeProgram.objects.create(
+            title='Add 10',
+            question_text='<p>Write a program that asks for a number, then adds 10 to the number, then prints it out.</p>',
+            solution='number = int(input("Number:"))\nprint(number + 10)',
+        )
+        answer_1 = QuestionTypeProgramTestCase.objects.create(
+            test_input='24\n25',
+            expected_output='34',
+            question=question_2,
+        )
+        answer_2 = QuestionTypeProgramTestCase.objects.create(
+            test_input='36',
+            expected_output='46',
+            question=question_2,
+        )
         print('Programming question added.')

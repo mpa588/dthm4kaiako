@@ -5,6 +5,12 @@ require('codemirror/mode/python/python.js');
 
 $(document).ready(function () {
     $('#run_code').click(function () {
+        // Set all input cells to contain list of input lines
+        $('.test-case-input').each(function (index) {
+            var element = $(this);
+            element.data('input_list', element.text().split('\n'));
+        });
+        // Empty all output cells
         $('.test-case-output').empty();
         var user_code = editor.getValue();
         run_test_cases(user_code);
@@ -84,7 +90,11 @@ function run_python_code(user_code, test_case) {
         read: builtinRead,
         // Placeholder function to display prompt when input is called
         inputfun: function (str) {
-            return window.prompt(str);
+            var input_element = $('#test-case-' + test_case['id'] + '-input');
+            var input_list = input_element.data('input_list');
+            var input = input_list.shift();
+            input_element.data('input_list', input_list);
+            return input;
         },
         inputfunTakesPrompt: true,
         // Append print() statements to output cell for test case
@@ -98,6 +108,7 @@ function run_python_code(user_code, test_case) {
     if (typeof user_code == 'string' && user_code.trim()) {
         try {
             Sk.importMainWithBody("<stdin>", false, user_code, true);
+        // TODO: Only catch Python errors
         } catch (error) {
             document.getElementById("error-output").innerHTML = error.toString();
         }
