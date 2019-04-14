@@ -203,10 +203,18 @@ class TestCaseProgramAdmin(admin.ModelAdmin):
 class TestCaseFunctionAdmin(admin.ModelAdmin):
     form = QuestionTypeFunctionTestCaseForm
 
+
+class AttemptAdmin(admin.ModelAdmin):
+    """Configuration for displaying attempts in admin."""
+
+    list_display = ('datetime', 'question', 'profile', 'passed_tests')
+    ordering = ('-datetime', )
+
+
 # admin.site.register(SkillArea)
 # admin.site.register(Token)
 # admin.site.register(Badge)
 # admin.site.register(Earned)
-# admin.site.register(Attempt)
+admin.site.register(Attempt, AttemptAdmin)
 # admin.site.register(Skill)
 # admin.site.register(LoginDay)

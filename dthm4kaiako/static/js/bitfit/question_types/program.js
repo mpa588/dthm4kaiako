@@ -1,4 +1,4 @@
-require('./base.js');
+var base = require('./base.js');
 require('skulpt');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/python/python.js');
@@ -16,7 +16,16 @@ $(document).ready(function () {
             }
         }
         var user_code = editor.getValue();
-        run_test_cases(user_code);
+        var passed = run_test_cases(user_code);
+        base.ajax_request(
+            'save_question_attempt',
+            {
+                user_input: user_code,
+                question: question_id,
+                passed_tests: passed,
+            },
+            function(result) {console.log(result);}
+        );
     });
 
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -79,17 +88,21 @@ function update_test_case_status(test_case) {
         row_element.addClass('table-danger');
         row_element.removeClass('table-success');
     }
+    return success;
 }
 
 function run_test_cases(user_code) {
+    var passed_all_tests = true;
+
     // Currently runs in sequential order.
     for (var id in test_cases) {
         if (test_cases.hasOwnProperty(id)) {
             var test_case = test_cases[id];
             run_python_code(user_code, test_case);
-            update_test_case_status(test_case);
+            passed_all_tests = passed_all_tests && update_test_case_status(test_case);
         }
     }
+    return passed_all_tests;
 }
 
 function run_python_code(user_code, test_case) {

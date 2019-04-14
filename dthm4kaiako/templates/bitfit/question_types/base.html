@@ -14,51 +14,9 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script type="text/javascript">window.CSRF_TOKEN = "{{ csrf_token }}"; </script>
+    {% csrf_token %}
     <script>
-        var question_id = {{question.id}};
+        var csrf_token = jQuery("[name=csrfmiddlewaretoken]").val();
+        var question_id = {{ question.id }};
     </script>
-    {% if question_subclass == "parsons" %}
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/jquery.min.js' %}"></script>
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/jquery-ui.min.js' %}"></script>
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/jquery.ui.touch-punch.min.js' %}"></script>
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/underscore-min.js' %}"></script>
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/lis.js' %}"></script>
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/parsons.js' %}"></script>
-        <script>
-            var initial = "{{question.solution|escapejs}}";
-        </script>
-        <script src="{% static 'js/bitfit/parsons.js' %}"></script>
-    {% elif question_subclass == "buggy" or question_subclass == "buggy_func" %}
-        <script src="{% static 'js/bitfit/vendor/ace-builds-master/src-min-noconflict/ace.js' %}" type="text/javascript" charset="utf-8"></script>
-        <script>
-            var buggy_program = "{{question.buggy.buggy_program|escapejs}}";
-            var solution = '{{question.solution|linebreaks}}';
-            {% if question_subclass == "buggy" %}
-                var is_func = false;
-            {% else %}
-                var is_func = true;
-            {% endif %}
-        </script>
-        <script src="{% static 'js/bitfit/buggy.js' %}"></script>
-    {% elif question_subclass == "programming" or question_subclass == "programming_func" %}
-        <script>
-            var solution = '{{ question.solution|linebreaks }}';
-            {% if question_subclass == "programming" %}
-                var is_func = false;
-            {% else %}
-                var is_func = true;
-            {% endif %}
-        </script>
-        <script src="{% static 'js/bitfit/programming.js' %}"></script>
-    {% endif %}
-{% endblock %}
-
-{% block css %}
-    {{ block.super }}
-    {% if question_subclass == "parsons" %}
-        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/parsons.css' %}" />
-        <link rel="stylesheet" href="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.css' %}" />
-        <script src="{% static 'js/bitfit/vendor/js-parsons-master/lib/prettify.js' %}"></script>
-    {% endif %}
-{% endblock %}
+{% endblock scripts %}

@@ -22,3 +22,7 @@ class User(AbstractUser):
     def __str__(self):
         """Name of the user."""
         return self.first_name
+
+    def full_name(self):
+        """Full name of the user."""
+        return '{} {}'.format(self.first_name, self.last_name)

@@ -23,7 +23,7 @@ class Profile(models.Model):
     # attempted_questions = models.ManyToManyField('Question', through='Attempt')
 
     def __str__(self):
-        return self.user.username
+        return self.user.full_name()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -70,17 +70,22 @@ def save_user_profile(sender, instance, **kwargs):
 #         return self.name
 
 
-# class Attempt(models.Model):
-#     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
-#     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-#     date = models.DateTimeField(auto_now_add=True)
-#     user_code = models.TextField()
-#     passed_tests = models.BooleanField(default=False)
-#     is_save = models.BooleanField(default=False)
-#     skills_hinted = models.ManyToManyField('Skill', blank=True)
+class Attempt(models.Model):
+    profile = models.ForeignKey(
+        'Profile',
+        on_delete=models.CASCADE
+    )
+    question = models.ForeignKey(
+        'Question',
+        on_delete=models.CASCADE
+    )
+    datetime = models.DateTimeField(auto_now_add=True)
+    user_code = models.TextField()
+    passed_tests = models.BooleanField(default=False)
+    # skills_hinted = models.ManyToManyField('Skill', blank=True)
 
-#     def __str__(self):
-#         return "Attempted '" + str(self.question) + "' on " + str(self.date)
+    def __str__(self):
+        return "Attempted '" + str(self.question) + "' on " + str(self.date)
 
 # ----- Base question classes -------------------------------------------------
 
