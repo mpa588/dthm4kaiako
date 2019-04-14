@@ -6,6 +6,7 @@ from django.contrib.auth import login, authenticate, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 import requests
 import time
@@ -332,9 +333,15 @@ class QuestionView(generic.base.TemplateView):
         context['test_cases'] = test_cases
         context['test_cases_json'] = json.dumps(list(test_cases))
 
-        # if self.request.user.is_authenticated:
-        #     question = self.get_object()
-        #     profile = self.request.user.profile
+        if self.request.user.is_authenticated:
+            try:
+                previous_attempt = Attempt.objects.filter(
+                    profile=self.request.user.profile,
+                    question=self.question,
+                ).latest('datetime')
+            except ObjectDoesNotExist:
+                previous_attempt = None
+            context['previous_attempt'] = previous_attempt
         #     all_attempts = Attempt.objects.filter(question=question, profile=profile)
         #     if len(all_attempts) > 0:
         #         context['previous_attempt'] = all_attempts.latest('date').user_code

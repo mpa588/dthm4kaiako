@@ -5,7 +5,7 @@
 {% block question %}
     <div class="col-12">
         <div class="border mb-3">
-            <textarea id="code" class="hidden">{% if not DEPLOYED %}{{ question.solution }}{% endif %}</textarea>
+            <textarea id="code" class="hidden">{{ previous_attempt.user_code }}</textarea>
         </div>
 
         <p>
