@@ -227,11 +227,6 @@ class Command(management.base.BaseCommand):
             expected_output='Hello world!',
             question=question_1,
         )
-        QuestionTypeProgramTestCase.objects.create(
-            test_input='',
-            expected_output='Hello world!',
-            question=question_1,
-        )
 
         question_2 = QuestionTypeProgram.objects.create(
             title='Add 10',

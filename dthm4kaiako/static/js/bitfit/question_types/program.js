@@ -99,7 +99,8 @@ function run_test_cases(user_code) {
         if (test_cases.hasOwnProperty(id)) {
             var test_case = test_cases[id];
             run_python_code(user_code, test_case);
-            passed_all_tests = passed_all_tests && update_test_case_status(test_case);
+            var passed_test = update_test_case_status(test_case);
+            passed_all_tests = passed_all_tests && passed_test;
         }
     }
     return passed_all_tests;
