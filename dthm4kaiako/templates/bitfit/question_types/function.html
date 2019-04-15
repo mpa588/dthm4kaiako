@@ -52,7 +52,6 @@
 {% block scripts %}
     {{ block.super }}
     <script>
-        var solution = '{{ question.solution|linebreaks }}';
         var test_cases_list = {{ test_cases_json|safe }};
     </script>
     <script src="{% static 'js/bitfit/question_types/function.js' %}"></script>
