@@ -1,12 +1,4 @@
-FROM uccser/nginx-with-gulp:1.13.3
-
-RUN apt-get update \
-    && apt-get install --no-install-suggests -y \
-       libcairo2-dev \
-       libpango1.0-dev \
-       libjpeg-dev \
-       libgif-dev \
-    && rm -rf /var/lib/apt/lists/*
+FROM uccser/nginx-with-gulp:1.15.8
 
 ADD dthm4kaiako/package.json /app/
 RUN npm install
