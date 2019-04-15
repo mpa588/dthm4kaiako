@@ -89,26 +89,26 @@ class IndexView(generic.base.TemplateView):
 #     return redirect(url)
 
 
-# def add_points(question, profile, passed_tests):
-#     """add appropriate number of points (if any) to user's account"""
-#     max_points_from_attempts = 3
-#     points_for_correct = 10
+def add_points(question, profile, passed_tests):
+    """add appropriate number of points (if any) to user's account"""
+    max_points_from_attempts = 3
+    points_for_correct = 10
 
-#     n_attempts = len(Attempt.objects.filter(question=question, profile=profile, is_save=False))
-#     previous_corrects = Attempt.objects.filter(question=question, profile=profile, passed_tests=True, is_save=False)
-#     is_first_correct = len(previous_corrects) == 1
+    n_attempts = len(Attempt.objects.filter(question=question, profile=profile, is_save=False))
+    previous_corrects = Attempt.objects.filter(question=question, profile=profile, passed_tests=True, is_save=False)
+    is_first_correct = len(previous_corrects) == 1
 
-#     points_to_add = 0
-#     if n_attempts <= max_points_from_attempts:
-#         points_to_add += 1
+    points_to_add = 0
+    if n_attempts <= max_points_from_attempts:
+        points_to_add += 1
 
-#     if passed_tests and is_first_correct:
-#         points_from_previous_attempts = n_attempts if n_attempts < max_points_from_attempts else max_points_from_attempts
-#         points_to_add += (points_for_correct - points_from_previous_attempts)
+    if passed_tests and is_first_correct:
+        points_from_previous_attempts = n_attempts if n_attempts < max_points_from_attempts else max_points_from_attempts
+        points_to_add += (points_for_correct - points_from_previous_attempts)
 
-#     profile.points += points_to_add
-#     profile.full_clean()
-#     profile.save()
+    profile.points += points_to_add
+    profile.full_clean()
+    profile.save()
 
 
 def save_question_attempt(request):

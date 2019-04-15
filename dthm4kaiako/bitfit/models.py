@@ -130,7 +130,7 @@ class TestCase(models.Model):
     objects through the InheritanceManager.
     """
 
-    expected_output = models.CharField(max_length=LARGE, blank=True)
+    expected_output = models.TextField(blank=True)
     objects = InheritanceManager()
 
     def __str__(self):
@@ -165,7 +165,6 @@ class QuestionTypeProgramTestCase(TestCase):
 class QuestionTypeFunction(Question):
 
     QUESTION_TYPE = 'function'
-    function_name = models.CharField(max_length=SMALL)
 
     class Meta:
         verbose_name = 'Function Question'
@@ -174,8 +173,7 @@ class QuestionTypeFunction(Question):
 
 class QuestionTypeFunctionTestCase(TestCase):
 
-    function_params = models.CharField(max_length=LARGE, blank=True)
-    expected_return = models.CharField(max_length=LARGE, blank=True)
+    test_code = models.TextField()
     question = models.ForeignKey(
         QuestionTypeFunction,
         related_name='test_cases',

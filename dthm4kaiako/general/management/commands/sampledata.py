@@ -35,6 +35,8 @@ from tests.dtta.factories import (
 from bitfit.models import (
     QuestionTypeProgram,
     QuestionTypeProgramTestCase,
+    QuestionTypeFunction,
+    QuestionTypeFunctionTestCase,
 )
 
 
@@ -242,5 +244,39 @@ class Command(management.base.BaseCommand):
             test_input='36',
             expected_output='46',
             question=question_2,
+        )
+
+        question_3 = QuestionTypeFunction.objects.create(
+            title='Doubler',
+            question_text=(
+                '<p>Write a function <code>doubler()</code> '
+                'that takes a number and returns double the number.</p>'
+            ),
+            solution='def doubler(num):\n    return num * 2',
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(2))',
+            expected_output='4',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(3))',
+            expected_output='6',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(15))',
+            expected_output='30',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(99))',
+            expected_output='198',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(-2))',
+            expected_output='-4',
+            question=question_3,
         )
         print('Programming question added.')
