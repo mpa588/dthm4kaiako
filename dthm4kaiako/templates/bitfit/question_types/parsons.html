@@ -1,0 +1,74 @@
+{% extends "bitfit/question_types/base.html" %}
+
+{% load static %}
+
+{% block question %}
+    <div class="col-12 col-md-6 mb-3">
+        <h3>Available lines</h3>
+        <div id="available-lines" class="parsons-drag-container">
+            {% for line in question.lines_as_list %}
+                <div class="parsons-draggable-line">
+                    <div class="parsons-line-content">
+                        {{ line }}
+                    </div>
+                    <div class="parsons-drag-container"></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 mb-3">
+        <h3>Your solution</h3>
+        <div id="user-code-lines" class="parsons-drag-container">
+        </div>
+    </div>
+
+    <div class="col-12">
+        <p>
+            <input id="run_code" type="button" value="Run code" class="btn btn-primary" />
+        </p>
+    </div>
+
+    <div class="col-12">
+        <div class="table-responsive">
+            <table id="test-case-table" class="table table-sm table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Test</th>
+                        <th scope="col">Expected output</th>
+                        <th scope="col">Received output</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for test_case in test_cases %}
+                        <tr id="test-case-{{ test_case.id }}-row">
+                            <td>
+                                <pre class="mb-0 test-case-test-code" id="test-case-{{ test_case.id }}-test-code">{{ test_case.test_code }}</pre>
+                            </td>
+                            <td>
+                                <pre class="mb-0" id="test-case-{{ test_case.id }}-expected-output">{{ test_case.expected_output }}</pre>
+                            </td>
+                            <td>
+                                <pre class="mb-0 test-case-output" id="test-case-{{ test_case.id }}-output"></pre>
+                            </td>
+                            <td id="test-case-{{ test_case.id }}-status">
+                                <span class="text-muted">
+                                    Not yet run
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock question %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        var test_cases_list = {{ test_cases_json|safe }};
+    </script>
+    <script src="{% static 'js/bitfit/question_types/parsons.js' %}"></script>
+{% endblock %}

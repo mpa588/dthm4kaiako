@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth import get_user_model
 from .models import *
-from .forms import *
 
 User = get_user_model()
 
@@ -38,12 +37,10 @@ class ProfileInline(admin.StackedInline):
 
 class ProgramTestCaseInline(admin.StackedInline):
     model = QuestionTypeProgramTestCase
-    form = QuestionTypeProgramTestCaseForm
     extra = 1
 
 class FunctionTestCaseInline(admin.StackedInline):
     model = QuestionTypeFunctionTestCase
-    form = QuestionTypeFunctionTestCaseForm
     extra = 1
 
 ### CUSTOM ADMINS ###
@@ -195,15 +192,6 @@ class CustomFunctionQuestionAdmin(CustomGenericQuestionAdmin):
 # class TestCaseAdmin(admin.ModelAdmin):
 #     form = TestCaseForm
 
-@admin.register(QuestionTypeProgramTestCase)
-class TestCaseProgramAdmin(admin.ModelAdmin):
-    form = QuestionTypeProgramTestCaseForm
-
-@admin.register(QuestionTypeFunctionTestCase)
-class TestCaseFunctionAdmin(admin.ModelAdmin):
-    form = QuestionTypeFunctionTestCaseForm
-
-
 class AttemptAdmin(admin.ModelAdmin):
     """Configuration for displaying attempts in admin."""
 
@@ -215,6 +203,8 @@ class AttemptAdmin(admin.ModelAdmin):
 # admin.site.register(Token)
 # admin.site.register(Badge)
 # admin.site.register(Earned)
+admin.site.register(QuestionTypeParsonsTestCase)
+admin.site.register(QuestionTypeParsons)
 admin.site.register(Attempt, AttemptAdmin)
 # admin.site.register(Skill)
 # admin.site.register(LoginDay)

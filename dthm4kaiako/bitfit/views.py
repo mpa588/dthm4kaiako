@@ -16,8 +16,8 @@ import json
 from ast import literal_eval
 import jinja2
 
-from .forms import *
 from bitfit.models import (
+    Profile,
     Question,
     TestCase,
     Attempt,
@@ -252,7 +252,7 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
     login_url = '/login/'
     redirect_field_name = 'next'
     template_name = 'bitfit/profile.html'
-    model = User
+    model = Profile
 
     def get_object(self):
         if self.request.user.is_authenticated:

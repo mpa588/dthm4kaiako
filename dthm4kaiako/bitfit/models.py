@@ -1,3 +1,4 @@
+from random import shuffle
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
@@ -134,7 +135,7 @@ class TestCase(models.Model):
     objects = InheritanceManager()
 
     def __str__(self):
-        return 'Test case for {} ({} > {})'.format(self.question.title, self.test_input, self.expected_output)
+        return 'Test case for {}'.format(self.question.title)
 
 # ----- Program question ------------------------------------------------------
 
@@ -182,6 +183,36 @@ class QuestionTypeFunctionTestCase(TestCase):
 
     class Meta:
         verbose_name = 'Function Question Test Case'
+
+
+# ----- Parsons problem question -----------------------------------------------------
+
+class QuestionTypeParsons(Question):
+
+    QUESTION_TYPE = 'parsons'
+    lines = models.TextField()
+
+    def lines_as_list(self):
+        """Return lines as shuffled list split by newlines."""
+        lines = self.lines.split('\n')
+        shuffle(lines)
+        return lines
+
+    class Meta:
+        verbose_name = 'Parsons Problem Question'
+
+
+class QuestionTypeParsonsTestCase(TestCase):
+
+    test_code = models.TextField()
+    question = models.ForeignKey(
+        QuestionTypeParsons,
+        related_name='test_cases',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Parsons Problem Question Test Case'
 
 
 # ----- Buggy program question ------------------------------------------------

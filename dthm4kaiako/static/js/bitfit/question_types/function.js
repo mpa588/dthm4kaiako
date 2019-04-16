@@ -1,6 +1,5 @@
 var base = require('./base.js');
 require('skulpt');
-require('js-parsons-master/lib/jquery.ui.touch-punch.min.js');
 var CodeMirror = require('codemirror');
 require('codemirror/mode/python/python.js');
 

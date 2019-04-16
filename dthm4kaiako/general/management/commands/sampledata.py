@@ -37,6 +37,8 @@ from bitfit.models import (
     QuestionTypeProgramTestCase,
     QuestionTypeFunction,
     QuestionTypeFunctionTestCase,
+    QuestionTypeParsons,
+    QuestionTypeParsonsTestCase,
 )
 
 
@@ -278,5 +280,49 @@ class Command(management.base.BaseCommand):
             test_code='print(doubler(-2))',
             expected_output='-4',
             question=question_3,
+        )
+
+        question_4 = QuestionTypeParsons.objects.create(
+            title='Double evens',
+            question_text=(
+                '<p>Write a function <code>double_even(number)</code> '
+                'that takes a number and returns double the number if it is even. Otherwise it returns the original number</p>'
+            ),
+            solution=(
+                'def double_even(number):\n'
+                '    if number % 2 == 0:\n'
+                '        return number * 2\n'
+                '    else:\n'
+                '        return number'
+            ),
+            lines=(
+                'def double_even(number):\n'
+                'if number % 2 == 0:\n'
+                'if number // 2 == 0:\n'
+                'return number * 2\n'
+                'return number x 2\n'
+                'else:\n'
+                'return number'
+            ),
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(2))',
+            expected_output='4',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(8))',
+            expected_output='16',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(3))',
+            expected_output='3',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(11))',
+            expected_output='11',
+            question=question_4,
         )
         print('Programming question added.')
