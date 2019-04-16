@@ -19,22 +19,38 @@
 // Parsons problems
 
 .parsons-drag-container {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    background-color: lightyellow;
+    padding: 0.7rem 0;
 }
 .parsons-draggable-line {
     font-family: $font-family-monospace;
-    background: white;
-    border: 1px solid #dee2e6;
+    background: #f2f3f5;
+    border: 2px solid #dee2e6;
+    border-radius: 5px;
+    margin-left: 2rem;
     margin-bottom: 0.3rem;
     cursor: grab;
-    .parsons-drag-container {
-        margin-left: 2rem;
+    padding-left: 0.5rem;
+}
+#user-code-lines,
+#available-lines {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding: 0.3rem;
+    min-height: 3rem;
+    > .parsons-draggable-line {
+        margin-left: 0 !important;
+    }
+    > .parsons-draggable-line:last-child {
+        margin-bottom: 0 !important;
     }
 }
-
-
+.parsons-line-content {
+    position: relative;
+    top: 0.5rem;
+}
+.sortable-chosen {
+    opacity: 0.5;
+}
 
 // Existing styles
 
