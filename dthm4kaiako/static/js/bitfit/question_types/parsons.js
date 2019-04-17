@@ -41,20 +41,28 @@ $(document).ready(function(){
 function get_user_code() {
     var indent = '';
     var code = '';
-    var top_element = document.getElementById('user-code-lines');
-    code = traverse_line(top_element, code, indent);
+    var top_element = $('#user-code-lines');
+    code = traverse_code_container(top_element, indent, true);
     return code;
 }
 
-function traverse_line(line, code, indent) {
-    code += indent + line.childNodes[0].nodeValue.trim() + '\n';
-    var children = $(line).children();
-    if (children.length > 0) {
-        indent += indent_increment;
-        children.each(function(){
-            code = traverse_line(this, code, indent);
+function traverse_code_container(container, indent, is_top) {
+    var container_code = '';
+    var lines = container.children('.parsons-draggable-line');
+    if (lines.length > 0) {
+        if (!is_top) {
+            indent += indent_increment;
+        }
+        lines.each(function() {
+            var line = $(this);
+            var line_code = line.children('.parsons-line-content').text().trim();
+            container_code += indent + line_code + '\n';
+            var line_container = line.children('.parsons-drag-container');
+            container_code += traverse_code_container(line_container, indent, false);
         });
-        indent -= indent_increment;
+        if (!is_top) {
+            indent = indent.substring(0, indent_increment.length);
+        }
     }
-    return code;
+    return container_code;
 }
