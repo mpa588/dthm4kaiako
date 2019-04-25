@@ -31,7 +31,7 @@ class IndexView(generic.base.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['questions'] = Question.objects.all()
+        context['questions'] = Question.objects.select_subclasses()
 
         # if self.request.user.is_authenticated:
         #     user = User.objects.get(username=self.request.user.username)
@@ -123,7 +123,9 @@ def save_question_attempt(request):
     Returns:
         JSON response with result.
     """
-    result = {}
+    result = {
+        'success': False,
+    }
     if request.is_ajax():
         if request.user.is_authenticated:
             request_json = json.loads(request.body.decode('utf-8'))
@@ -139,6 +141,7 @@ def save_question_attempt(request):
                 user_code=user_code,
                 passed_tests=passed_tests,
             )
+            result['success'] = True
 
             # if not is_save:
             #     add_points(question, profile, passed_tests)
@@ -256,7 +259,7 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
 
     def get_object(self):
         if self.request.user.is_authenticated:
-            return User.objects.get(username=self.request.user.username)
+            return Profile.objects.get(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
