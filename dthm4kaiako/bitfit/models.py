@@ -99,6 +99,7 @@ class Question(models.Model):
     objects through the InheritanceManager.
     """
 
+    slug = models.SlugField(unique=True)
     title = models.CharField(max_length=SMALL)
     question_text = RichTextField()
     solution = models.TextField()

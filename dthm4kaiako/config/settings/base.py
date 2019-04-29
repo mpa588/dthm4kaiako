@@ -419,5 +419,7 @@ AUTHENTIC_CONTEXT_CARDS_FILENAME_TEMPLATE = 'Authentic Context Cards - Level {}'
 # Other
 # ------------------------------------------------------------------------------
 DEPLOYMENT_TYPE = 'local'
+BITFIT_QUESTIONS_BASE_PATH = os.path.join(str(ROOT_DIR.path("bitfit")), "content")
+CUSTOM_VERTO_TEMPLATES = os.path.join(str(ROOT_DIR.path("utils")), "custom_converter_templates", "")
 SAMPLE_DATA_ADMIN_PASSWORD = env('SAMPLE_DATA_ADMIN_PASSWORD', default='password')
 SAMPLE_DATA_USER_PASSWORD = env('SAMPLE_DATA_USER_PASSWORD', default='password')

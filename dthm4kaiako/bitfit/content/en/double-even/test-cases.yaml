@@ -1,0 +1,19 @@
+- code: print(double_even(2)
+  expected-output: 4
+  type: normal
+
+- code: print(double_even(8)
+  expected-output: 16
+  type: normal
+
+- code: print(double_even(3)
+  expected-output: 3
+  type: normal
+
+- code: print(double_even(11)
+  expected-output: 11
+  type: normal
+
+- code: print(double_even(-2)
+  expected-output: -4
+  type: boundary
