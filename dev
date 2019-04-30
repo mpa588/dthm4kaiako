@@ -171,6 +171,12 @@ cmd_load_achievement_objectives() {
 }
 defhelp load_achievement_objectives "Load achievement objectives."
 
+# Run load_bitfit_questions command
+cmd_load_bitfit_questions() {
+  docker-compose exec django /docker_venv/bin/python3 ./manage.py load_bitfit_questions
+}
+defhelp load_bitfit_questions "Load Bitfit questions."
+
 # Run create_cards command
 cmd_create_cards() {
   docker-compose exec django /docker_venv/bin/python3 ./manage.py create_cards

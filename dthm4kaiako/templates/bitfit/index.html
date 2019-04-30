@@ -11,12 +11,15 @@
                         <a href="{{ question.get_absolute_url }}">
                             {{ question.title }}
                         </a>
+                        <em class="text-muted">
+                            ({{ question.QUESTION_TYPE }})
+                        </em>
                     </li>
                 {% endfor %}
             </ul>
         {% endif %}
 
-        <b>Skill Areas</b>
+        <!-- <b>Skill Areas</b>
         {% if skill_list %}
             <ul>
             {% for skill in skill_list %}
@@ -26,7 +29,7 @@
             {% endfor %}
             </ul>
         {% else %}
-            <p>No skill areas are available (use admin site to add)</p>
-        {% endif %}
+            <p>No skill areas are available.</p>
+        {% endif %} -->
     </div>
 {% endblock %}

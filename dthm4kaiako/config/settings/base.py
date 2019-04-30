@@ -422,5 +422,7 @@ AUTHENTIC_CONTEXT_CARDS_PRINT_TYPES = (AUTHENTIC_CONTEXT_CARDS_SINGLE_PRINT, AUT
 # Other
 # ------------------------------------------------------------------------------
 DEPLOYMENT_TYPE = 'local'
+BITFIT_QUESTIONS_BASE_PATH = os.path.join(str(ROOT_DIR.path("bitfit")), "content")
+CUSTOM_VERTO_TEMPLATES = os.path.join(str(ROOT_DIR.path("utils")), "custom_converter_templates", "")
 SAMPLE_DATA_ADMIN_PASSWORD = env('SAMPLE_DATA_ADMIN_PASSWORD', default='password')
 SAMPLE_DATA_USER_PASSWORD = env('SAMPLE_DATA_USER_PASSWORD', default='password')
