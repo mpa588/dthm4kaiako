@@ -58,7 +58,7 @@ class Badge(models.Model):
 class Earned(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     badge = models.ForeignKey('Badge', on_delete=models.CASCADE)
-    datetime = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.date)

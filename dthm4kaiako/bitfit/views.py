@@ -15,6 +15,7 @@ import random
 import json
 from ast import literal_eval
 import jinja2
+import logging
 
 from bitfit.models import (
     Profile,
@@ -23,6 +24,7 @@ from bitfit.models import (
     Attempt,
     Badge, Earned, LoginDay)
 
+logger = logging.getLogger("bitfit")
 
 class IndexView(generic.base.TemplateView):
     """Homepage for BitFit."""
@@ -184,10 +186,12 @@ def check_badge_conditions(user):
     """check badges for account creation, days logged in, and questions solved"""
     earned_badges = user.profile.earned_badges.all()
 
+    logger.debug("Check creation")
     # account creation badge
     try:
         creation_badge = Badge.objects.get(id_name="create-account")
         if creation_badge not in earned_badges:
+            logger.debug("no created badge")
             new_achievement = Earned(profile=user.profile, badge=creation_badge)
             new_achievement.full_clean()
             new_achievement.save()
@@ -210,7 +214,7 @@ def check_badge_conditions(user):
     #             new_achievement = Earned(profile=user.profile, badge=login_badge)
     #             new_achievement.full_clean()
     #             new_achievement.save()
-    #
+
     # # solved questions badges
     # solve_badges = Badge.objects.filter(id_name__contains="solve")
     # for solve_badge in solve_badges:
@@ -233,19 +237,19 @@ def get_past_5_weeks(user):
 
     past_5_weeks = []
     to_date = today
-    for week in range(0, 5):
-        from_date = today - datetime.timedelta(days=today.weekday(), weeks=week)
-        attempts = Attempt.objects.filter(profile=user.profile, date__range=(from_date, to_date + datetime.timedelta(days=1)), is_save=False)
-        distinct_questions_attempted = attempts.values("question__pk").distinct().count()
-
-        label = str(week) + " weeks ago"
-        if week == 0:
-            label = "This week"
-        elif week == 1:
-            label = "Last week"
-
-        past_5_weeks.append({'week': from_date, 'n_attempts': distinct_questions_attempted, 'label': label})
-        to_date = from_date
+    # for week in range(0, 5):
+    #     from_date = today - datetime.timedelta(days=today.weekday(), weeks=week)
+    #     attempts = Attempt.objects.filter(profile=user.profile, date__range=(from_date, to_date + datetime.timedelta(days=1)), is_save=False)
+    #     distinct_questions_attempted = attempts.values("question__pk").distinct().count()
+    #
+    #     label = str(week) + " weeks ago"
+    #     if week == 0:
+    #         label = "This week"
+    #     elif week == 1:
+    #         label = "Last week"
+    #
+    #     past_5_weeks.append({'week': from_date, 'n_attempts': distinct_questions_attempted, 'label': label})
+    #     to_date = from_date
     return past_5_weeks
 
 
