@@ -21,7 +21,7 @@ from bitfit.models import (
     Question,
     TestCase,
     Attempt,
-)
+    Badge, Earned, LoginDay)
 
 
 class IndexView(generic.base.TemplateView):
@@ -148,105 +148,105 @@ def save_question_attempt(request):
 
     return JsonResponse(result)
 
-# def save_goal_choice(request):
-#     """update user's goal choice in database"""
-#     request_json = json.loads(request.body.decode('utf-8'))
-#     if request.user.is_authenticated:
-#         user = User.objects.get(username=request.user.username)
-#         profile = user.profile
+def save_goal_choice(request):
+    """update user's goal choice in database"""
+    request_json = json.loads(request.body.decode('utf-8'))
+    if request.user.is_authenticated:
+        user = request.user
+        profile = user.profile
 
-#         goal_choice = request_json['goal_choice']
-#         profile.goal = int(goal_choice)
-#         profile.full_clean()
-#         profile.save()
+        goal_choice = request_json['goal_choice']
+        profile.goal = int(goal_choice)
+        profile.full_clean()
+        profile.save()
 
-#     return JsonResponse({})
-
-
-# def get_consecutive_sections(days_logged_in):
-#     """return a list of lists of consecutive days logged in"""
-#     consecutive_sections = []
-
-#     today = days_logged_in[0]
-#     previous_section = [today]
-#     for day in days_logged_in[1:]:
-#         if day == previous_section[-1] - datetime.timedelta(days=1):
-#             previous_section.append(day)
-#         else:
-#             consecutive_sections.append(previous_section)
-#             previous_section = [day]
-
-#     consecutive_sections.append(previous_section)
-#     return consecutive_sections
+    return JsonResponse({})
 
 
-# def check_badge_conditions(user):
-#     """check badges for account creation, days logged in, and questions solved"""
-#     earned_badges = user.profile.earned_badges.all()
+def get_consecutive_sections(days_logged_in):
+    """return a list of lists of consecutive days logged in"""
+    consecutive_sections = []
 
-#     # account creation badge
-#     try:
-#         creation_badge = Badge.objects.get(id_name="create-account")
-#         if creation_badge not in earned_badges:
-#             new_achievement = Earned(profile=user.profile, badge=creation_badge)
-#             new_achievement.full_clean()
-#             new_achievement.save()
-#     except (Badge.DoesNotExist):
-#         pass
+    today = days_logged_in[0]
+    previous_section = [today]
+    for day in days_logged_in[1:]:
+        if day == previous_section[-1] - datetime.timedelta(days=1):
+            previous_section.append(day)
+        else:
+            consecutive_sections.append(previous_section)
+            previous_section = [day]
 
-#     # consecutive days logged in badges
-#     login_badges = Badge.objects.filter(id_name__contains="login")
-#     for login_badge in login_badges:
-#         if login_badge not in earned_badges:
-#             n_days = int(login_badge.id_name.split("-")[1])
-
-#             days_logged_in = LoginDay.objects.filter(profile=user.profile)
-#             days_logged_in = sorted(days_logged_in, key=lambda k: k.day, reverse=True)
-#             sections = get_consecutive_sections([d.day for d in days_logged_in])
-
-#             max_consecutive = len(max(sections, key=lambda k: len(k)))
-
-#             if max_consecutive >= n_days:
-#                 new_achievement = Earned(profile=user.profile, badge=login_badge)
-#                 new_achievement.full_clean()
-#                 new_achievement.save()
-
-#     # solved questions badges
-#     solve_badges = Badge.objects.filter(id_name__contains="solve")
-#     for solve_badge in solve_badges:
-#         if solve_badge not in earned_badges:
-#             n_problems = int(solve_badge.id_name.split("-")[1])
-#             n_completed = Attempt.objects.filter(profile=user.profile, passed_tests=True, is_save=False)
-#             n_distinct = n_completed.values("question__pk").distinct().count()
-#             if n_distinct >= n_problems:
-#                 new_achievement = Earned(profile=user.profile, badge=solve_badge)
-#                 new_achievement.full_clean()
-#                 new_achievement.save()
+    consecutive_sections.append(previous_section)
+    return consecutive_sections
 
 
-# def get_past_5_weeks(user):
-#     """get how many questions a user has done each week for the last 5 weeks"""
-#     t = datetime.date.today()
-#     today = datetime.datetime(t.year, t.month, t.day)
-#     last_monday = today - datetime.timedelta(days=today.weekday(), weeks=0)
-#     last_last_monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
+def check_badge_conditions(user):
+    """check badges for account creation, days logged in, and questions solved"""
+    earned_badges = user.profile.earned_badges.all()
 
-#     past_5_weeks = []
-#     to_date = today
-#     for week in range(0, 5):
-#         from_date = today - datetime.timedelta(days=today.weekday(), weeks=week)
-#         attempts = Attempt.objects.filter(profile=user.profile, date__range=(from_date, to_date + datetime.timedelta(days=1)), is_save=False)
-#         distinct_questions_attempted = attempts.values("question__pk").distinct().count()
+    # account creation badge
+    try:
+        creation_badge = Badge.objects.get(id_name="create-account")
+        if creation_badge not in earned_badges:
+            new_achievement = Earned(profile=user.profile, badge=creation_badge)
+            new_achievement.full_clean()
+            new_achievement.save()
+    except (Badge.DoesNotExist):
+        pass
 
-#         label = str(week) + " weeks ago"
-#         if week == 0:
-#             label = "This week"
-#         elif week == 1:
-#             label = "Last week"
+    # consecutive days logged in badges
+    # login_badges = Badge.objects.filter(id_name__contains="login")
+    # for login_badge in login_badges:
+    #     if login_badge not in earned_badges:
+    #         n_days = int(login_badge.id_name.split("-")[1])
+    #
+    #         days_logged_in = LoginDay.objects.filter(profile=user.profile)
+    #         days_logged_in = sorted(days_logged_in, key=lambda k: k.day, reverse=True)
+    #         sections = get_consecutive_sections([d.day for d in days_logged_in])
+    #
+    #         max_consecutive = len(max(sections, key=lambda k: len(k)))
+    #
+    #         if max_consecutive >= n_days:
+    #             new_achievement = Earned(profile=user.profile, badge=login_badge)
+    #             new_achievement.full_clean()
+    #             new_achievement.save()
+    #
+    # # solved questions badges
+    # solve_badges = Badge.objects.filter(id_name__contains="solve")
+    # for solve_badge in solve_badges:
+    #     if solve_badge not in earned_badges:
+    #         n_problems = int(solve_badge.id_name.split("-")[1])
+    #         n_completed = Attempt.objects.filter(profile=user.profile, passed_tests=True, is_save=False)
+    #         n_distinct = n_completed.values("question__pk").distinct().count()
+    #         if n_distinct >= n_problems:
+    #             new_achievement = Earned(profile=user.profile, badge=solve_badge)
+    #             new_achievement.full_clean()
+    #             new_achievement.save()
 
-#         past_5_weeks.append({'week': from_date, 'n_attempts': distinct_questions_attempted, 'label': label})
-#         to_date = from_date
-#     return past_5_weeks
+
+def get_past_5_weeks(user):
+    """get how many questions a user has done each week for the last 5 weeks"""
+    t = datetime.date.today()
+    today = datetime.datetime(t.year, t.month, t.day)
+    last_monday = today - datetime.timedelta(days=today.weekday(), weeks=0)
+    last_last_monday = today - datetime.timedelta(days=today.weekday(), weeks=1)
+
+    past_5_weeks = []
+    to_date = today
+    for week in range(0, 5):
+        from_date = today - datetime.timedelta(days=today.weekday(), weeks=week)
+        attempts = Attempt.objects.filter(profile=user.profile, date__range=(from_date, to_date + datetime.timedelta(days=1)), is_save=False)
+        distinct_questions_attempted = attempts.values("question__pk").distinct().count()
+
+        label = str(week) + " weeks ago"
+        if week == 0:
+            label = "This week"
+        elif week == 1:
+            label = "Last week"
+
+        past_5_weeks.append({'week': from_date, 'n_attempts': distinct_questions_attempted, 'label': label})
+        to_date = from_date
+    return past_5_weeks
 
 
 class ProfileView(LoginRequiredMixin, generic.DetailView):
@@ -264,14 +264,14 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # user = User.objects.get(username=self.request.user.username)
+        user = self.request.user
         # questions = user.profile.attempted_questions.all()
 
-        # check_badge_conditions(user)
+        check_badge_conditions(user)
 
-        # context['goal'] = user.profile.goal
-        # context['all_badges'] = Badge.objects.all()
-        # context['past_5_weeks'] = get_past_5_weeks(user)
+        context['goal'] = user.profile.goal
+        context['all_badges'] = Badge.objects.all()
+        context['past_5_weeks'] = get_past_5_weeks(user)
 
         # history = []
         # for question in questions:
@@ -380,161 +380,3 @@ class QuestionView(generic.base.TemplateView):
 #         }
 #     return result
 
-# def send_code(request):
-#     """formats code using template then sends to SphereEngine"""
-#     request_json = json.loads(request.body.decode('utf-8'))
-#     question_id = request_json['question']
-#     question = Question.objects.get_subclass(pk=question_id)
-
-#     template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
-#     template_env = jinja2.Environment(loader=template_loader)
-#     template_file = "common.py"
-#     template = template_env.get_template(template_file)
-
-#     is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
-#     is_buggy = isinstance(question, Buggy)
-
-#     if is_buggy and not is_func:
-#         user_input = ''
-#     else:
-#         user_input = request_json['user_input']
-
-#     if is_func:
-#         if is_buggy:
-#             func_name = question.buggy.buggyfunction.function_name
-#         else:
-#             func_name = question.programming.programmingfunction.function_name
-#     else:
-#         func_name = ''
-
-#     if is_buggy:
-#         user_stdin = request_json['buggy_stdin']
-#         inputs = [user_stdin.split('\n')]
-#         expected_output = request_json['expected_print']
-#         outputs = [expected_output]
-#         if is_func:
-#             eval_result = literal_eval_params(user_input)
-#             if len(eval_result['error']) > 0:
-#                 return JsonResponse(eval_result)
-#             test_params = eval_result['params']
-
-#             params = [test_params]
-#             expected_return = request_json['expected_return']
-#             returns = [literal_eval(expected_return) if expected_return != '' else None]
-#         else:
-#             params = [[]]
-#             returns = []
-
-#         user_input = question.buggy.buggy_program
-#         n_test_cases = 1
-#     else:
-#         if is_func:
-#             test_cases = question.programming.programmingfunction.testcasefunction_set.all()
-#             params = [literal_eval_params(case.function_params)['params'] for case in test_cases]
-#             returns = [literal_eval(case.expected_return) if case.expected_return != '' else None for case in test_cases]
-#         else:
-#             test_cases = question.programming.testcaseprogram_set.all()
-#             params = [[]]
-#             returns = []
-
-#         inputs = [case.test_input.split('\n') for case in test_cases]
-#         outputs = [literal_eval('"""' + case.expected_output + '"""') for case in test_cases]
-#         n_test_cases = len(test_cases)
-
-#     if not is_func:
-#         user_input = user_input.replace('\n', '\n    ')
-
-#     context_variables = {
-#         'params': repr(params),
-#         'inputs': repr(inputs),
-#         'outputs': repr(outputs),
-#         'returns': repr(returns),
-#         'n_test_cases': n_test_cases,
-#         'is_func': is_func,
-#         'is_buggy': is_buggy,
-#         'user_code': user_input.replace('\t', '    '),
-#         'function_name': func_name
-#     }
-#     code = template.render(**context_variables)
-#     #print(code)
-#     token = "?access_token=" + Token.objects.get(pk='sphere').token
-
-#     response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
-#     result = response.json()
-
-#     return JsonResponse(result)
-
-# def send_solution(request):
-#     """formats correct solution for buggy question type then sends to SphereEngine"""
-#     request_json = json.loads(request.body.decode('utf-8'))
-#     question_id = request_json['question']
-#     question = Question.objects.get_subclass(pk=question_id)
-#     solution = question.solution
-
-#     is_func = isinstance(question, ProgrammingFunction) or isinstance(question, BuggyFunction)
-#     if is_func:
-#         test_params = request_json['user_input']
-#         func_name = question.buggy.buggyfunction.function_name
-#     else:
-#         test_params = ''
-#         func_name = ''
-#     test_input = request_json['buggy_stdin']
-
-#     template_loader = jinja2.FileSystemLoader(searchpath="bitfit/wrapper_templates")
-#     template_env = jinja2.Environment(loader=template_loader)
-#     template_file = "common.py"
-#     template = template_env.get_template(template_file)
-
-#     eval_result = literal_eval_params(test_params)
-#     if len(eval_result['error']) > 0:
-#         return JsonResponse(eval_result)
-#     test_params = eval_result['params']
-
-#     params = [test_params]
-#     inputs = [test_input.split('\n')]
-#     outputs = ['']
-#     returns = [None]
-
-#     context_variables = {
-#         'params': repr(params),
-#         'inputs': repr(inputs),
-#         'outputs': repr(outputs),
-#         'returns': repr(returns),
-#         'n_test_cases': 1,
-#         'is_func': is_func,
-#         'is_buggy': False,
-#         'user_code': solution.replace('\t', '    ').replace('\n', '\n    '),
-#         'function_name': func_name
-#     }
-#     code = template.render(**context_variables)
-#     #print(code)
-#     token = "?access_token=" + Token.objects.get(pk='sphere').token
-
-#     response = requests.post(BASE_URL + token, data = {"language": PYTHON, "sourceCode": code})
-#     result = response.json()
-
-#     return JsonResponse(result)
-
-
-# def get_output(request):
-#     """gets code output from SphereEngine (stdout, stderr, and compiler error)"""
-#     request_json = json.loads(request.body.decode('utf-8'))
-#     submission_id = request_json['id']
-#     question_id = request_json['question']
-
-#     token = "?access_token=" + Token.objects.get(pk='sphere').token
-
-#     params = {
-#         "withOutput": True,
-#         "withStderr": True,
-#         "withCmpinfo": True
-#     }
-#     response = requests.get(BASE_URL + submission_id + token, params=params)
-#     result = response.json()
-
-#     if result["status"] == COMPLETED:
-#         result["completed"] = True
-#     else:
-#         result["completed"] = False
-
-#     return JsonResponse(result)

@@ -20,7 +20,7 @@ class Profile(models.Model):
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(7)]
     )
-    # earned_badges = models.ManyToManyField('Badge', through='Earned')
+    earned_badges = models.ManyToManyField('Badge', through='Earned')
     # attempted_questions = models.ManyToManyField('Question', through='Attempt')
 
     def __str__(self):
@@ -38,37 +38,37 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-# class LoginDay(models.Model):
-#     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
-#     day = models.DateField(auto_now_add=True)
+class LoginDay(models.Model):
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    day = models.DateField(auto_now_add=True)
 
-#     def __str__(self):
-#         return str(self.day)
-
-
-# class Badge(models.Model):
-#     id_name = models.CharField(max_length=SMALL, unique=True)
-#     display_name = models.CharField(max_length=SMALL)
-#     description = models.CharField(max_length=LARGE)
-
-#     def __str__(self):
-#         return self.display_name
+    def __str__(self):
+        return str(self.day)
 
 
-# class Earned(models.Model):
-#     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
-#     badge = models.ForeignKey('Badge', on_delete=models.CASCADE)
-#     date = models.DateTimeField(auto_now_add=True)
+class Badge(models.Model):
+    id_name = models.CharField(max_length=SMALL, unique=True)
+    display_name = models.CharField(max_length=SMALL)
+    description = models.CharField(max_length=LARGE)
 
-#     def __str__(self):
-#         return str(self.date)
+    def __str__(self):
+        return self.display_name
 
-# class Token(models.Model):
-#     name = models.CharField(max_length=SMALL, primary_key=True)
-#     token = models.CharField(max_length=LARGE)
 
-#     def __str__(self):
-#         return self.name
+class Earned(models.Model):
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    badge = models.ForeignKey('Badge', on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.date)
+
+class Token(models.Model):
+    name = models.CharField(max_length=SMALL, primary_key=True)
+    token = models.CharField(max_length=LARGE)
+
+    def __str__(self):
+        return self.name
 
 
 class Attempt(models.Model):

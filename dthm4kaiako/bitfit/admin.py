@@ -10,18 +10,18 @@ def get_question_type(question_id):
     """returns the type of question and the route to the appropriate admin page"""
     question = Question.objects.get_subclass(pk=question_id)
     link = "/admin/questions/"
-    if isinstance(question, ProgrammingFunction):
+    if isinstance(question, QuestionTypeFunction):
         subclass = "Function Programming Question"
         link += "programmingfunction/"
-    elif isinstance(question, Programming):
+    elif isinstance(question, QuestionTypeProgram):
         subclass = "Programming Question"
         link += "programming/"
-    elif isinstance(question, BuggyFunction):
-        subclass = "Function Debugging Question"
-        link += "buggyfunction/"
-    elif isinstance(question, Buggy):
-        subclass = "Debugging Question"
-        link += "buggy/"
+    # elif isinstance(question, BuggyFunction):
+    #     subclass = "Function Debugging Question"
+    #     link += "buggyfunction/"
+    # elif isinstance(question, Buggy):
+    #     subclass = "Debugging Question"
+    #     link += "buggy/"
     else:
         subclass = "Parsons Problem"
         link += "question/"
@@ -105,7 +105,7 @@ class CustomProgramQuestionAdmin(CustomGenericQuestionAdmin):
             pk = context['original'].pk
             question = Question.objects.get_subclass(pk=pk)
             subclass, link = get_question_type(pk)
-            is_correct_type = not isinstance(question, ProgrammingFunction)
+            is_correct_type = not isinstance(question, QuestionTypeFunction)
         else:
             subclass = ''
             link = ''
