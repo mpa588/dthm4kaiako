@@ -6,6 +6,7 @@ from django.core import management
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
+from django.utils.text import slugify
 from allauth.account.models import EmailAddress
 from resources.models import (
     Language,
@@ -233,6 +234,104 @@ class Command(management.base.BaseCommand):
             question=question_1,
         )
 
+        question_2 = QuestionTypeProgram.objects.create(
+            title='Add 10',
+            question_text='<p>Write a program that asks for a number, adds 10 to the number, then prints it out.</p>',
+            solution='number = int(input("Number:"))\nprint(number + 10)',
+            slug=slugify('Add 10')
+        )
+        QuestionTypeProgramTestCase.objects.create(
+            test_input='24\n25',
+            expected_output='34',
+            question=question_2,
+        )
+        QuestionTypeProgramTestCase.objects.create(
+            test_input='36',
+            expected_output='46',
+            question=question_2,
+        )
+
+        question_3 = QuestionTypeFunction.objects.create(
+            title='Doubler',
+            question_text=(
+                '<p>Write a function <code>doubler()</code> '
+                'that takes a number and returns double the number.</p>'
+            ),
+            solution='def doubler(num):\n    return num * 2',
+            slug=slugify('Doubler')
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(2))',
+            expected_output='4',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(3))',
+            expected_output='6',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(15))',
+            expected_output='30',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(99))',
+            expected_output='198',
+            question=question_3,
+        )
+        QuestionTypeFunctionTestCase.objects.create(
+            test_code='print(doubler(-2))',
+            expected_output='-4',
+            question=question_3,
+        )
+
+        question_4 = QuestionTypeParsons.objects.create(
+            title='Double evens',
+            question_text=(
+                '<p>Write a function <code>double_even(number)</code> '
+                'that takes a number and returns double the number if it is even. Otherwise it returns the original number</p>'
+            ),
+            solution=(
+                'def double_even(number):\n'
+                '    if number % 2 == 0:\n'
+                '        return number * 2\n'
+                '    else:\n'
+                '        return number'
+            ),
+            lines=(
+                'def double_even(number):\n'
+                'if number % 2 == 0:\n'
+                'if number // 2 == 0:\n'
+                'return number * 2\n'
+                'return number x 2\n'
+                'else:\n'
+                'return number'
+            ),
+            slug=slugify('Double evens')
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(2))',
+            expected_output='4',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(8))',
+            expected_output='16',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(3))',
+            expected_output='3',
+            question=question_4,
+        )
+        QuestionTypeParsonsTestCase.objects.create(
+            test_code='print(double_even(11))',
+            expected_output='11',
+            question=question_4,
+        )
+        print('Programming question added.')
+
         Badge.objects.create(
             id_name='create-account',
             display_name='Created an account!',
@@ -281,98 +380,4 @@ class Command(management.base.BaseCommand):
             description='Attempted one thousand questions',
             icon_name='img/icons/bitfit/icons8-attempt-made-gold-50.png'
         )
-
-        question_2 = QuestionTypeProgram.objects.create(
-            title='Add 10',
-            question_text='<p>Write a program that asks for a number, adds 10 to the number, then prints it out.</p>',
-            solution='number = int(input("Number:"))\nprint(number + 10)',
-        )
-        QuestionTypeProgramTestCase.objects.create(
-            test_input='24\n25',
-            expected_output='34',
-            question=question_2,
-        )
-        QuestionTypeProgramTestCase.objects.create(
-            test_input='36',
-            expected_output='46',
-            question=question_2,
-        )
-
-        question_3 = QuestionTypeFunction.objects.create(
-            title='Doubler',
-            question_text=(
-                '<p>Write a function <code>doubler()</code> '
-                'that takes a number and returns double the number.</p>'
-            ),
-            solution='def doubler(num):\n    return num * 2',
-        )
-        QuestionTypeFunctionTestCase.objects.create(
-            test_code='print(doubler(2))',
-            expected_output='4',
-            question=question_3,
-        )
-        QuestionTypeFunctionTestCase.objects.create(
-            test_code='print(doubler(3))',
-            expected_output='6',
-            question=question_3,
-        )
-        QuestionTypeFunctionTestCase.objects.create(
-            test_code='print(doubler(15))',
-            expected_output='30',
-            question=question_3,
-        )
-        QuestionTypeFunctionTestCase.objects.create(
-            test_code='print(doubler(99))',
-            expected_output='198',
-            question=question_3,
-        )
-        QuestionTypeFunctionTestCase.objects.create(
-            test_code='print(doubler(-2))',
-            expected_output='-4',
-            question=question_3,
-        )
-
-        # question_4 = QuestionTypeParsons.objects.create(
-        #     title='Double evens',
-        #     question_text=(
-        #         '<p>Write a function <code>double_even(number)</code> '
-        #         'that takes a number and returns double the number if it is even. Otherwise it returns the original number</p>'
-        #     ),
-        #     solution=(
-        #         'def double_even(number):\n'
-        #         '    if number % 2 == 0:\n'
-        #         '        return number * 2\n'
-        #         '    else:\n'
-        #         '        return number'
-        #     ),
-        #     lines=(
-        #         'def double_even(number):\n'
-        #         'if number % 2 == 0:\n'
-        #         'if number // 2 == 0:\n'
-        #         'return number * 2\n'
-        #         'return number x 2\n'
-        #         'else:\n'
-        #         'return number'
-        #     ),
-        # )
-        # QuestionTypeParsonsTestCase.objects.create(
-        #     test_code='print(double_even(2))',
-        #     expected_output='4',
-        #     question=question_4,
-        # )
-        # QuestionTypeParsonsTestCase.objects.create(
-        #     test_code='print(double_even(8))',
-        #     expected_output='16',
-        #     question=question_4,
-        # )
-        # QuestionTypeParsonsTestCase.objects.create(
-        #     test_code='print(double_even(3))',
-        #     expected_output='3',
-        #     question=question_4,
-        # )
-        # QuestionTypeParsonsTestCase.objects.create(
-        #     test_code='print(double_even(11))',
-        #     expected_output='11',
-        #     question=question_4,
-        # )
-        print('Programming question added.')
+        print("Badges added.")
