@@ -24,7 +24,17 @@ from bitfit.models import (
     Attempt,
     Badge, Earned, LoginDay)
 
-logger = logging.getLogger("bitfit")
+logger = logging.getLogger(__name__)
+del logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'incremental': True,
+    'root': {
+        'level': 'DEBUG',
+    },
+}
 
 class IndexView(generic.base.TemplateView):
     """Homepage for BitFit."""
@@ -186,17 +196,55 @@ def check_badge_conditions(user):
     """check badges for account creation, days logged in, and questions solved"""
     earned_badges = user.profile.earned_badges.all()
 
-    logger.debug("Check creation")
     # account creation badge
     try:
         creation_badge = Badge.objects.get(id_name="create-account")
         if creation_badge not in earned_badges:
-            logger.debug("no created badge")
             new_achievement = Earned(profile=user.profile, badge=creation_badge)
             new_achievement.full_clean()
             new_achievement.save()
-    except (Badge.DoesNotExist):
+    except Badge.DoesNotExist:
+        logger.warning("No such badge: create-account")
         pass
+
+    try:
+        question_badges = Badge.objects.filter(id_name__contains="questions-solved")
+        logger.warning(len(question_badges))
+        solved = Attempt.objects.filter(profile=user.profile, passed_tests=True)
+        for question_badge in question_badges:
+            logger.warning(question_badge.id_name)
+            if question_badge not in earned_badges:
+                logger.warning("check badge")
+                num_questions = int(question_badge.id_name.split("-")[2])
+                logger.warning(len(solved)  )
+                if len(solved) >= num_questions:
+                    logger.warning("making badge")
+                    new_achievement = Earned(profile=user.profile, badge=question_badge)
+                    new_achievement.full_clean()
+                    new_achievement.save()
+    except Badge.DoesNotExist:
+        logger.warning("No such badges: questions-solved")
+        pass
+
+    try:
+        attempt_badges = Badge.objects.filter(id_name__contains="attempts-made")
+        logger.warning(len(attempt_badges))
+        solved = Attempt.objects.filter(profile=user.profile)
+        for attempt_badge in attempt_badges:
+            logger.warning(attempt_badge.id_name)
+            if attempt_badge not in earned_badges:
+                logger.warning("check badge")
+                num_questions = int(attempt_badge.id_name.split("-")[2])
+                logger.warning(len(solved))
+                if len(solved) >= num_questions:
+                    logger.warning("making badge")
+                    new_achievement = Earned(profile=user.profile, badge=attempt_badge)
+                    new_achievement.full_clean()
+                    new_achievement.save()
+    except Badge.DoesNotExist:
+        logger.warning("No such badges: questions-solved")
+        pass
+
 
     # consecutive days logged in badges
     # login_badges = Badge.objects.filter(id_name__contains="login")
@@ -215,18 +263,6 @@ def check_badge_conditions(user):
     #             new_achievement.full_clean()
     #             new_achievement.save()
 
-    # # solved questions badges
-    # solve_badges = Badge.objects.filter(id_name__contains="solve")
-    # for solve_badge in solve_badges:
-    #     if solve_badge not in earned_badges:
-    #         n_problems = int(solve_badge.id_name.split("-")[1])
-    #         n_completed = Attempt.objects.filter(profile=user.profile, passed_tests=True, is_save=False)
-    #         n_distinct = n_completed.values("question__pk").distinct().count()
-    #         if n_distinct >= n_problems:
-    #             new_achievement = Earned(profile=user.profile, badge=solve_badge)
-    #             new_achievement.full_clean()
-    #             new_achievement.save()
-
 
 def get_past_5_weeks(user):
     """get how many questions a user has done each week for the last 5 weeks"""
@@ -240,7 +276,7 @@ def get_past_5_weeks(user):
     # for week in range(0, 5):
     #     from_date = today - datetime.timedelta(days=today.weekday(), weeks=week)
     #     attempts = Attempt.objects.filter(profile=user.profile, date__range=(from_date, to_date + datetime.timedelta(days=1)), is_save=False)
-    #     distinct_questions_attempted = attempts.values("question__pk").distinct().count()
+    #     distinct_questions_attempted = attempts.values("question__pk").distinct().count()-
     #
     #     label = str(week) + " weeks ago"
     #     if week == 0:
@@ -274,6 +310,7 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
         check_badge_conditions(user)
 
         context['goal'] = user.profile.goal
+        logger.warning(user.profile.goal)
         context['all_badges'] = Badge.objects.all()
         context['past_5_weeks'] = get_past_5_weeks(user)
 

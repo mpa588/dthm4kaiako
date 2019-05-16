@@ -50,6 +50,7 @@ class Badge(models.Model):
     id_name = models.CharField(max_length=SMALL, unique=True)
     display_name = models.CharField(max_length=SMALL)
     description = models.CharField(max_length=LARGE)
+    icon_name = models.CharField(null=True, max_length=SMALL)
 
     def __str__(self):
         return self.display_name
@@ -62,6 +63,7 @@ class Earned(models.Model):
 
     def __str__(self):
         return str(self.date)
+
 
 class Token(models.Model):
     name = models.CharField(max_length=SMALL, primary_key=True)
@@ -89,6 +91,7 @@ class Attempt(models.Model):
         return "Attempted '" + str(self.question) + "' on " + str(self.date)
 
 # ----- Base question classes -------------------------------------------------
+
 
 class Question(models.Model):
     """Base class for a question for BitFit.
@@ -139,6 +142,7 @@ class TestCase(models.Model):
         return 'Test case for {}'.format(self.question.title)
 
 # ----- Program question ------------------------------------------------------
+
 
 class QuestionTypeProgram(Question):
 

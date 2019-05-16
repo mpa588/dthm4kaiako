@@ -39,6 +39,7 @@ from bitfit.models import (
     QuestionTypeFunctionTestCase,
     QuestionTypeParsons,
     QuestionTypeParsonsTestCase,
+    Badge
 )
 
 
@@ -168,7 +169,7 @@ class Command(management.base.BaseCommand):
                 'CS4HS',
             ),
             (
-                'Computer Science for Primary Schools',
+                'Computer ScieBitFit nce for Primary Schools',
                 'CS4PS',
             ),
             (
@@ -232,6 +233,55 @@ class Command(management.base.BaseCommand):
             question=question_1,
         )
 
+        Badge.objects.create(
+            id_name='create-account',
+            display_name='Created an account!',
+            description='Created your very own account',
+            icon_name='img/icons/bitfit/icons8-badge-create-account-48.png'
+        )
+
+        Badge.objects.create(
+            id_name='questions-solved-1',
+            display_name='Solved one question!',
+            description='Solved your very first question',
+            icon_name='img/icons/bitfit/icons8-question-solved-black-50.png'
+        )
+
+        Badge.objects.create(
+            id_name='questions-solved-3',
+            display_name='Solved three questions!',
+            description='Solved three questions',
+            icon_name='img/icons/bitfit/icons8-question-solved-bronze-50.png'
+        )
+
+        Badge.objects.create(
+            id_name='attempts-made-1',
+            display_name='Made your first attempt at a question!',
+            description='Attempted one question',
+            icon_name='img/icons/bitfit/icons8-attempt-made-black-50.png'
+        )
+
+        Badge.objects.create(
+            id_name='attempts-made-10',
+            display_name='Made 10 question attempts!',
+            description='Attempted ten questions',
+            icon_name='img/icons/bitfit/icons8-attempt-made-bronze-50.png'
+        )
+
+        Badge.objects.create(
+            id_name='attempts-made-100',
+            display_name='Made 100 question attempts!',
+            description='Attempted one hundred questions',
+            icon_name='img/icons/bitfit/icons8-attempt-made-silver-50.png'
+        )
+
+        Badge.objects.create(
+            id_name='attempts-made-1000',
+            display_name='Made 1000 question attempts!',
+            description='Attempted one thousand questions',
+            icon_name='img/icons/bitfit/icons8-attempt-made-gold-50.png'
+        )
+
         question_2 = QuestionTypeProgram.objects.create(
             title='Add 10',
             question_text='<p>Write a program that asks for a number, adds 10 to the number, then prints it out.</p>',
@@ -282,47 +332,47 @@ class Command(management.base.BaseCommand):
             question=question_3,
         )
 
-        question_4 = QuestionTypeParsons.objects.create(
-            title='Double evens',
-            question_text=(
-                '<p>Write a function <code>double_even(number)</code> '
-                'that takes a number and returns double the number if it is even. Otherwise it returns the original number</p>'
-            ),
-            solution=(
-                'def double_even(number):\n'
-                '    if number % 2 == 0:\n'
-                '        return number * 2\n'
-                '    else:\n'
-                '        return number'
-            ),
-            lines=(
-                'def double_even(number):\n'
-                'if number % 2 == 0:\n'
-                'if number // 2 == 0:\n'
-                'return number * 2\n'
-                'return number x 2\n'
-                'else:\n'
-                'return number'
-            ),
-        )
-        QuestionTypeParsonsTestCase.objects.create(
-            test_code='print(double_even(2))',
-            expected_output='4',
-            question=question_4,
-        )
-        QuestionTypeParsonsTestCase.objects.create(
-            test_code='print(double_even(8))',
-            expected_output='16',
-            question=question_4,
-        )
-        QuestionTypeParsonsTestCase.objects.create(
-            test_code='print(double_even(3))',
-            expected_output='3',
-            question=question_4,
-        )
-        QuestionTypeParsonsTestCase.objects.create(
-            test_code='print(double_even(11))',
-            expected_output='11',
-            question=question_4,
-        )
+        # question_4 = QuestionTypeParsons.objects.create(
+        #     title='Double evens',
+        #     question_text=(
+        #         '<p>Write a function <code>double_even(number)</code> '
+        #         'that takes a number and returns double the number if it is even. Otherwise it returns the original number</p>'
+        #     ),
+        #     solution=(
+        #         'def double_even(number):\n'
+        #         '    if number % 2 == 0:\n'
+        #         '        return number * 2\n'
+        #         '    else:\n'
+        #         '        return number'
+        #     ),
+        #     lines=(
+        #         'def double_even(number):\n'
+        #         'if number % 2 == 0:\n'
+        #         'if number // 2 == 0:\n'
+        #         'return number * 2\n'
+        #         'return number x 2\n'
+        #         'else:\n'
+        #         'return number'
+        #     ),
+        # )
+        # QuestionTypeParsonsTestCase.objects.create(
+        #     test_code='print(double_even(2))',
+        #     expected_output='4',
+        #     question=question_4,
+        # )
+        # QuestionTypeParsonsTestCase.objects.create(
+        #     test_code='print(double_even(8))',
+        #     expected_output='16',
+        #     question=question_4,
+        # )
+        # QuestionTypeParsonsTestCase.objects.create(
+        #     test_code='print(double_even(3))',
+        #     expected_output='3',
+        #     question=question_4,
+        # )
+        # QuestionTypeParsonsTestCase.objects.create(
+        #     test_code='print(double_even(11))',
+        #     expected_output='11',
+        #     question=question_4,
+        # )
         print('Programming question added.')

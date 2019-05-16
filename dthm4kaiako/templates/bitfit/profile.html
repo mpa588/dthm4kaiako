@@ -23,11 +23,12 @@
         </ul>
         <b>Points</b>: {{user.profile.points}}
         <br>
-        <b>Achievements</b>:
+        <b>Achievements:</b>
         <br>
         {% for badge in all_badges %}
             {% if badge in user.profile.earned_badges.all %}
-            <u>{{badge.name}} - {{badge.description}}</u>
+              <img src="{% static badge.icon_name %}">
+              <u>{{badge.name}} - {{badge.description}}</u>
             {% else %}
             <i>{{badge.name}} - {{badge.description}}</i>
             {% endif %}
@@ -67,7 +68,7 @@
     </p>
     <div class="js-gauge demo gauge"></div>
 
-    Number of questions attempted:
+    Number of questions attempted this week:
     <br>
     {% for week in past_5_weeks %}
     <div id="past-5-weeks">
