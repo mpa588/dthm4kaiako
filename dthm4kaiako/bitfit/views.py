@@ -101,7 +101,7 @@ class IndexView(generic.base.TemplateView):
 #     return redirect(url)
 
 
-def add_points(question, profile, passed_tests):
+def add_points(question, profile, attempt):
     """add appropriate number of points (if any) to user's account"""
     max_points_from_attempts = 3
     points_for_correct = 10
@@ -114,7 +114,7 @@ def add_points(question, profile, passed_tests):
     if n_attempts <= max_points_from_attempts:
         points_to_add += 1
 
-    if passed_tests and is_first_correct:
+    if attempt.passed_tests and is_first_correct:
         points_from_previous_attempts = n_attempts if n_attempts < max_points_from_attempts else max_points_from_attempts
         points_to_add += (points_for_correct - points_from_previous_attempts)
 
@@ -155,8 +155,7 @@ def save_question_attempt(request):
             )
             result['success'] = True
 
-            # if not is_save:
-            #     add_points(question, profile, passed_tests)
+            add_points(question, profile, attempt)
 
     return JsonResponse(result)
 
@@ -209,16 +208,11 @@ def check_badge_conditions(user):
 
     try:
         question_badges = Badge.objects.filter(id_name__contains="questions-solved")
-        logger.warning(len(question_badges))
         solved = Attempt.objects.filter(profile=user.profile, passed_tests=True)
         for question_badge in question_badges:
-            logger.warning(question_badge.id_name)
             if question_badge not in earned_badges:
-                logger.warning("check badge")
                 num_questions = int(question_badge.id_name.split("-")[2])
-                logger.warning(len(solved)  )
                 if len(solved) >= num_questions:
-                    logger.warning("making badge")
                     new_achievement = Earned(profile=user.profile, badge=question_badge)
                     new_achievement.full_clean()
                     new_achievement.save()
@@ -228,15 +222,14 @@ def check_badge_conditions(user):
 
     try:
         attempt_badges = Badge.objects.filter(id_name__contains="attempts-made")
-        logger.warning(len(attempt_badges))
-        solved = Attempt.objects.filter(profile=user.profile)
+        attempted = Attempt.objects.filter(profile=user.profile)
         for attempt_badge in attempt_badges:
-            logger.warning(attempt_badge.id_name)
             if attempt_badge not in earned_badges:
-                logger.warning("check badge")
                 num_questions = int(attempt_badge.id_name.split("-")[2])
-                logger.warning(len(solved))
-                if len(solved) >= num_questions:
+                logger.warning(attempt_badge.id_name)
+                logger.warning(num_questions)
+                logger.warning(len(attempted))
+                if len(attempted) >= num_questions:
                     logger.warning("making badge")
                     new_achievement = Earned(profile=user.profile, badge=attempt_badge)
                     new_achievement.full_clean()
